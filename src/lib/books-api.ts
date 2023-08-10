@@ -1,0 +1,44 @@
+import axios from "axios";
+
+const BASE_URL = "https://www.googleapis.com/books/v1/volumes";
+
+type GoogleBooksResult = {
+	id: string;
+	volumeInfo: {
+		authors: string[];
+		imageLinks: {
+			thumbnail: string;
+		};
+		title: string;
+		subtitle: string | undefined;
+	};
+};
+
+export type Book = {
+	authors: string[];
+	imgUrl: string;
+	title: string;
+	subtitle: string;
+	googleId: string;
+};
+
+const transformBooks = (books: GoogleBooksResult[]): Book[] => {
+	return books.map((book) => {
+		const { volumeInfo, id } = book;
+		return {
+			authors: volumeInfo?.authors || [],
+			imgUrl: volumeInfo?.imageLinks?.thumbnail,
+			title: volumeInfo?.title,
+			subtitle: volumeInfo?.subtitle,
+			googleId: id,
+		};
+	});
+};
+
+export const searchBooks = async (term: string) => {
+	const { data } = await axios.get(
+		`${BASE_URL}?q=${term}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`,
+	);
+
+	return transformBooks(data.items);
+};
