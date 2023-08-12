@@ -14,7 +14,7 @@ const SearchBooksPage = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 
 	const { data, refetch, isFetching } = useQuery(
-		["books", searchTerm],
+		["books"],
 		() => searchBooks(searchTerm),
 		{
 			enabled: false,
@@ -44,7 +44,11 @@ const SearchBooksPage = () => {
 			</div>
 			<div className="flex flex-col gap-2">
 				{data?.map((book) => (
-					<div key={book.googleId} className="flex gap-1">
+					<Link
+						key={book.googleId}
+						className="flex gap-1"
+						href={`/book/${book.googleId}`}
+					>
 						<Image
 							src={book.imgUrl || DEFAULT_IMG_URL}
 							height={128}
@@ -55,7 +59,7 @@ const SearchBooksPage = () => {
 							<p>{book.title}</p>
 							<p className="text-sm text-black/80">{book.authors[0]}</p>
 						</div>
-					</div>
+					</Link>
 				))}
 			</div>
 		</main>

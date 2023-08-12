@@ -10,7 +10,7 @@ type GoogleBooksResult = {
 			thumbnail: string;
 		};
 		title: string;
-		subtitle: string | undefined;
+		subtitle: string | null;
 	};
 };
 
@@ -29,7 +29,7 @@ const transformBooks = (books: GoogleBooksResult[]): Book[] => {
 			authors: volumeInfo?.authors || [],
 			imgUrl: volumeInfo?.imageLinks?.thumbnail,
 			title: volumeInfo?.title,
-			subtitle: volumeInfo?.subtitle,
+			subtitle: volumeInfo?.subtitle || null,
 			googleId: id,
 		};
 	});
@@ -41,4 +41,12 @@ export const searchBooks = async (term: string) => {
 	);
 
 	return transformBooks(data.items);
+};
+
+export const getBookById = async (id: string) => {
+	const { data } = await axios.get(
+		`${BASE_URL}/${id}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`,
+	);
+
+	return transformBooks([data]);
 };
