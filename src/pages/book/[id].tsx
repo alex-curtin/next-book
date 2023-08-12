@@ -1,12 +1,14 @@
 import { type GetServerSideProps } from "next";
 import Image from "next/image";
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
 
 import { DEFAULT_IMG_URL } from "~/constants";
 import { Textarea } from "~/components/ui/textarea";
 import { type Book, getBookById, searchBooks } from "~/lib/books-api";
 import { Button } from "~/components/ui/button";
 import StarIcon from "~/components/ui/icons/star-icon";
+import Link from "next/link";
 
 const AddPost = () => {
 	const [postContent, setPostContent] = useState("");
@@ -22,9 +24,9 @@ const AddPost = () => {
 		<div className="flex flex-col gap-1">
 			<div className="flex">
 				{Array.from({ length: 5 }).map((_, i) => (
-					<button type="button" onClick={() => setRating(i + 1)}>
-						{/* rome-ignore lint/suspicious/noArrayIndexKey: <explanation> */}
-						<StarIcon filled={i < rating} key={i} />
+					// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+					<button type="button" onClick={() => setRating(i + 1)} key={i}>
+						<StarIcon filled={i < rating} />
 					</button>
 				))}
 			</div>
@@ -44,6 +46,7 @@ const AddPost = () => {
 };
 
 const SingleBookPage = (props: { id: string; book: Book }) => {
+	const { isSignedIn } = useUser();
 	const { book } = props;
 
 	if (!book) return <div>404...can't find that book</div>;
@@ -63,7 +66,13 @@ const SingleBookPage = (props: { id: string; book: Book }) => {
 					<p className="text-black/80">{book.authors.join(" | ")}</p>
 				</div>
 			</div>
-			<AddPost />
+			{isSignedIn ? (
+				<AddPost />
+			) : (
+				<div>
+					<Link href="/signin">Sign in</Link> to create a post
+				</div>
+			)}
 		</main>
 	);
 };
