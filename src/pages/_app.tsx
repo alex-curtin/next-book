@@ -1,16 +1,15 @@
 import "~/styles/globals.css";
 import type { AppProps } from "next/app";
-import { QueryClient, QueryClientProvider } from "react-query";
 import { ClerkProvider } from "@clerk/nextjs";
 
-const queryClient = new QueryClient();
+import { api } from "~/utils/api";
 
-export default function App({ Component, pageProps }: AppProps) {
+const App = ({ Component, pageProps }: AppProps) => {
 	return (
-		<QueryClientProvider client={queryClient}>
-			<ClerkProvider>
-				<Component {...pageProps} />
-			</ClerkProvider>
-		</QueryClientProvider>
+		<ClerkProvider>
+			<Component {...pageProps} />
+		</ClerkProvider>
 	);
-}
+};
+
+export default api.withTRPC(App);

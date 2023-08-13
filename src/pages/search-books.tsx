@@ -8,17 +8,16 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import SearchIcon from "~/components/ui/icons/search-icon";
 import { DEFAULT_IMG_URL } from "~/constants";
+import { api } from "~/utils/api";
 
 const SearchBooksPage = () => {
-	const queryClient = useQueryClient();
 	const [searchTerm, setSearchTerm] = useState("");
 
-	const { data, refetch, isFetching } = useQuery(
-		["books"],
-		() => searchBooks(searchTerm),
+	const { data, refetch, isFetching } = api.googleApi.searchBooks.useQuery(
 		{
-			enabled: false,
+			term: searchTerm,
 		},
+		{ enabled: false },
 	);
 
 	const onClick = () => {

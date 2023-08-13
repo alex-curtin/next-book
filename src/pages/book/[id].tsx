@@ -9,6 +9,8 @@ import { type Book, getBookById, searchBooks } from "~/lib/books-api";
 import { Button } from "~/components/ui/button";
 import StarIcon from "~/components/ui/icons/star-icon";
 import Link from "next/link";
+import { generateSSHelper } from "~/server/helpers/generateSSHelper";
+import { api } from "~/utils/api";
 
 const AddPost = () => {
 	const [postContent, setPostContent] = useState("");
@@ -45,9 +47,9 @@ const AddPost = () => {
 	);
 };
 
-const SingleBookPage = (props: { id: string; book: Book }) => {
+const SingleBookPage = ({ id }: { id: string }) => {
 	const { isSignedIn } = useUser();
-	const { book } = props;
+	const { data: book } = api.googleApi.getBookById.useQuery({ id });
 
 	if (!book) return <div>404...can't find that book</div>;
 
@@ -80,23 +82,20 @@ const SingleBookPage = (props: { id: string; book: Book }) => {
 export default SingleBookPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+	const ssHelper = generateSSHelper();
 	const id = context.params.id;
-	try {
-		// workaround - google api get volume by id not working
-		const books = await searchBooks(id);
-		const book = books.find((book) => book.googleId === id);
-		return {
-			props: {
-				id,
-				book,
-			},
-		};
-	} catch (error) {
-		return {
-			props: {
-				id,
-				book: null,
-			},
-		};
-	}
+
+	if (!id) throw new Error("no id");
+
+	await ssHelper.googleApi.getBookById.prefetch({ id });
+	// workaround - google api get volume by id not working
+	// const books = await searchBooks(id);
+	// const book = books.find((book) => book.googleId === id);
+
+	return {
+		props: {
+			trpcState: ssHelper.dehydrate(),
+			id,
+		},
+	};
 };
