@@ -96,3 +96,4 @@ export const commentRelations = relations(comments, ({ one }) => ({
 }));
 
 export type Book = InferModel<typeof books>;
+export type Post = InferModel<typeof posts>;

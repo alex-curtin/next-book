@@ -3,7 +3,13 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
-import { books, authors, bookAuthors, posts } from "~/server/db/schema";
+import {
+	books,
+	authors,
+	bookAuthors,
+	posts,
+	type Post,
+} from "~/server/db/schema";
 
 export const postsRouter = createTRPCRouter({
 	createPost: privateProcedure

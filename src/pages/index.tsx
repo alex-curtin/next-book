@@ -1,11 +1,12 @@
 import Link from "next/link";
 
+import PageLayout from "~/components/layout";
+
 const Home = () => {
 	return (
-		<main className="flex min-h-screen flex-col items-center justify-between p-24 ">
-			Home
-			<Link href="/search-books">Search for books</Link>
-		</main>
+		<PageLayout>
+			<div className="flex flex-col items-center justify-between">Home</div>
+		</PageLayout>
 	);
 };
 

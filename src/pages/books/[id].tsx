@@ -12,6 +12,7 @@ import StarIcon from "~/components/ui/icons/star-icon";
 import Link from "next/link";
 import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 import { api } from "~/utils/api";
+import PageLayout from "~/components/layout";
 
 const AddPost = ({ book }: { book: Book }) => {
 	const router = useRouter();
@@ -75,28 +76,30 @@ const SingleBookPage = ({ id }: { id: string }) => {
 	if (!book) return <div>404...can't find that book</div>;
 
 	return (
-		<main className="flex flex-col items-center p-4 gap-2">
-			<div className="flex gap-2">
-				<Image
-					src={book.imgUrl || DEFAULT_IMG_URL}
-					width={96}
-					height={96}
-					alt={book.title}
-				/>
-				<div>
-					<h2 className="text-xl">{book.title}</h2>
-					<h3>{book.subtitle}</h3>
-					<p className="text-black/80">{book.authors.join(" | ")}</p>
+		<PageLayout>
+			<div className="flex flex-col items-center p-4 gap-2">
+				<div className="flex gap-2">
+					<Image
+						src={book.imgUrl || DEFAULT_IMG_URL}
+						width={96}
+						height={96}
+						alt={book.title}
+					/>
+					<div>
+						<h2 className="text-xl">{book.title}</h2>
+						<h3>{book.subtitle}</h3>
+						<p className="text-black/80">{book.authors.join(" | ")}</p>
+					</div>
 				</div>
+				{isSignedIn ? (
+					<AddPost book={book} />
+				) : (
+					<div>
+						<Link href="/signin">Sign in</Link> to create a post
+					</div>
+				)}
 			</div>
-			{isSignedIn ? (
-				<AddPost book={book} />
-			) : (
-				<div>
-					<Link href="/signin">Sign in</Link> to create a post
-				</div>
-			)}
-		</main>
+		</PageLayout>
 	);
 };
 
