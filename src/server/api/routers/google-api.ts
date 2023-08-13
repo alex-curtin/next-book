@@ -58,12 +58,11 @@ export const googleApiRouter = createTRPCRouter({
 	getBookById: publicProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input }) => {
-			// workaround - google api get volume by id not working
 			const { data } = await axios.get(
-				`${BASE_URL}?q=${input.id}&key=${process.env.GOOGLE_API_KEY}`,
+				`${BASE_URL}/${input.id}?key=${process.env.GOOGLE_API_KEY}`,
 			);
-			const transformedBooks = transformBooks(data.items);
+			const transformedBooks = transformBooks([data]);
 
-			return transformedBooks.find((book) => book.googleId === input.id);
+			return transformedBooks[0];
 		}),
 });

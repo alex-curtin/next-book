@@ -1,9 +1,10 @@
 import { TRPCError, initTRPC } from "@trpc/server";
 import { CreateNextContextOptions } from "@trpc/server/adapters/next";
-
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { getAuth } from "@clerk/nextjs/server";
+
+import { db } from "../db/db";
 
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
 	const { req } = opts;
@@ -12,6 +13,7 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
 
 	return {
 		userId,
+		db,
 	};
 };
 

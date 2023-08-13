@@ -2,6 +2,7 @@ import { type GetServerSideProps } from "next";
 import Image from "next/image";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/router";
 
 import { DEFAULT_IMG_URL } from "~/constants";
 import { Textarea } from "~/components/ui/textarea";
@@ -12,13 +13,33 @@ import Link from "next/link";
 import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 import { api } from "~/utils/api";
 
-const AddPost = () => {
+const AddPost = ({ book }: { book: Book }) => {
+	const router = useRouter();
 	const [postContent, setPostContent] = useState("");
 	const [rating, setRating] = useState(1);
+	const { mutate } = api.posts.createPost.useMutation({
+		onSuccess: (post) => {
+			console.log("success");
+			router.push(`/posts/${post.id}`);
+		},
+	});
 
-	const onClickCreate = () => {
+	const onClickCreate = async () => {
 		if (postContent.length) {
 			console.log(postContent);
+			await mutate({
+				book: {
+					title: book.title,
+					subtitle: book.subtitle || "",
+					imageUrl: book.imgUrl,
+					googleId: book.googleId,
+				},
+				authors: book.authors,
+				post: {
+					content: postContent,
+					rating,
+				},
+			});
 		}
 	};
 
@@ -69,7 +90,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 				</div>
 			</div>
 			{isSignedIn ? (
-				<AddPost />
+				<AddPost book={book} />
 			) : (
 				<div>
 					<Link href="/signin">Sign in</Link> to create a post
@@ -88,9 +109,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	if (!id) throw new Error("no id");
 
 	await ssHelper.googleApi.getBookById.prefetch({ id });
-	// workaround - google api get volume by id not working
-	// const books = await searchBooks(id);
-	// const book = books.find((book) => book.googleId === id);
 
 	return {
 		props: {
