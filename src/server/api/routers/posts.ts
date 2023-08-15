@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, asc, desc } from "drizzle-orm";
+import { clerkClient } from "@clerk/nextjs";
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
 import {
@@ -9,7 +10,43 @@ import {
 	bookAuthors,
 	posts,
 	type Post,
+	type PostWithBooksAndAuthors,
 } from "~/server/db/schema";
+
+const formatPosts = async (posts: PostWithBooksAndAuthors[]) => {
+	const users = await clerkClient.users.getUserList({
+		userId: posts.map((post) => post.posterId),
+	});
+
+	return posts.map((post) => {
+		const poster = users.find((user) => user.id === post.posterId);
+
+		if (!poster) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Poster not found",
+			});
+		}
+		const { book, ...postData } = post;
+		const { bookAuthors, ...bookData } = book;
+		const transformedBook = {
+			...bookData,
+			authors: bookAuthors.map((b) => b.author),
+		};
+
+		return {
+			post: {
+				...postData,
+				poster: {
+					id: poster.id,
+					username: poster.username,
+					imageUrl: poster.imageUrl,
+				},
+			},
+			book: transformedBook,
+		};
+	});
+};
 
 export const postsRouter = createTRPCRouter({
 	createPost: privateProcedure
@@ -97,6 +134,67 @@ export const postsRouter = createTRPCRouter({
 					},
 				},
 			});
-			return post;
+
+			if (!post) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Post not found",
+				});
+			}
+
+			const [formattedPost] = formatPosts([post]);
+		}),
+
+	getAll: publicProcedure.query(async ({ ctx }) => {
+		const allPosts = await ctx.db.query.posts.findMany({
+			orderBy: [desc(posts.createdAt)],
+			with: {
+				book: {
+					with: {
+						bookAuthors: {
+							columns: {
+								bookId: false,
+								authorId: false,
+							},
+							with: {
+								author: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
+		const formattedPosts = formatPosts(allPosts);
+
+		return formattedPosts;
+	}),
+
+	getAllByUser: publicProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			const userPosts = await ctx.db.query.posts.findMany({
+				where: eq(input.id, posts.posterId),
+				orderBy: [desc(posts.createdAt)],
+				with: {
+					book: {
+						with: {
+							bookAuthors: {
+								columns: {
+									bookId: false,
+									authorId: false,
+								},
+								with: {
+									author: true,
+								},
+							},
+						},
+					},
+				},
+			});
+
+			const formattedPosts = formatPosts(userPosts);
+
+			return formattedPosts;
 		}),
 });

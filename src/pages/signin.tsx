@@ -5,7 +5,9 @@ import PageLayout from "~/components/layout";
 const SigninPage = () => {
 	return (
 		<PageLayout>
-			<SignIn signUpUrl="/signup" />
+			<div className="flex justify-center">
+				<SignIn signUpUrl="/signup" path="/signin" />
+			</div>
 		</PageLayout>
 	);
 };

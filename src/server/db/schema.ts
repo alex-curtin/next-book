@@ -97,3 +97,11 @@ export const commentRelations = relations(comments, ({ one }) => ({
 
 export type Book = InferModel<typeof books>;
 export type Post = InferModel<typeof posts>;
+export type Author = InferModel<typeof authors>;
+export type BookAuthor = InferModel<typeof bookAuthors>;
+export type BookWithAuthors = Book & {
+	bookAuthors: BookAuthor & { author: Author }[];
+};
+export type PostWithBooksAndAuthors = Post & {
+	book: BookWithAuthors;
+};

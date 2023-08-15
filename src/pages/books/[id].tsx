@@ -56,7 +56,7 @@ const AddPost = ({ book }: { book: Book }) => {
 			</div>
 			<Textarea
 				name="post"
-				cols="30"
+				cols="60"
 				rows="10"
 				value={postContent}
 				placeholder="Write a review"
