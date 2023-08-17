@@ -52,7 +52,6 @@ export const googleApiRouter = createTRPCRouter({
 			const { data } = await axios.get(
 				`${BASE_URL}?q=${input.term}&key=${process.env.GOOGLE_API_KEY}`,
 			);
-			console.log("google books search", data.items);
 
 			return transformBooks(data.items);
 		}),

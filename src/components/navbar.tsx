@@ -20,7 +20,7 @@ const NavBar = () => {
 			</Link>
 			<div className="flex gap-8 items-center">
 				{user && <Link href={`/users/${user.id}`}>My Posts</Link>}
-				<Link href="/search-books">Search Books</Link>
+				<Link href="/search">Search Books</Link>
 				{user ? (
 					<DropdownMenu>
 						<DropdownMenuTrigger>

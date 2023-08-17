@@ -1,7 +1,7 @@
 import { authMiddleware } from "@clerk/nextjs";
 
 export default authMiddleware({
-	publicRoutes: ["/", "/(.*)", "/search-books"],
+	publicRoutes: ["/", "/(.*)"],
 	ignoredRoutes: ["/((?!api|trpc))(_next|.+..+)(.*)"],
 });
 

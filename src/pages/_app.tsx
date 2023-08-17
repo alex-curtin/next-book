@@ -6,10 +6,11 @@ import { api } from "~/utils/api";
 import NavBar from "~/components/navbar";
 
 const App = ({ Component, pageProps }: AppProps) => {
+	const getLayout = Component.getLayout || ((page) => page);
 	return (
 		<ClerkProvider>
 			<NavBar />
-			<Component {...pageProps} />
+			{getLayout(<Component {...pageProps} />)}
 		</ClerkProvider>
 	);
 };

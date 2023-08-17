@@ -13,6 +13,7 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 	const { data: author, isLoading } = api.authors.getAllPostsBy.useQuery({
 		id,
 	});
+
 	if (isLoading) return <LoadingPage />;
 	if (!author) return <NotFound message="Author not found" />;
 
@@ -21,8 +22,8 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 			<div className="flex flex-col items-center p-4 max-w-2xl m-auto">
 				<h2 className="text-lg font-semibold">{author.name}</h2>
 				{author.books.map(({ bookData, posts }) => (
-					<div className="flex flex-col p-4">
-						<BookItem book={bookData} key={bookData.id} />
+					<div key={bookData.id} className="flex flex-col p-4">
+						<BookItem book={bookData} />
 						<div>
 							{posts.map((post) => (
 								<PostItem key={post.id} post={post} />
