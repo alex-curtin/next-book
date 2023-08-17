@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { eq, asc, desc } from "drizzle-orm";
-import { clerkClient } from "@clerk/nextjs";
+import { auth, clerkClient } from "@clerk/nextjs";
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
 import {
@@ -58,7 +58,7 @@ export const postsRouter = createTRPCRouter({
 					subtitle: z.string().optional(),
 					googleId: z.string(),
 				}),
-				authors: z.array(z.string()),
+				authors: z.array(z.object({ name: z.string() })),
 				post: z.object({
 					content: z.string(),
 					rating: z.number(),
@@ -84,12 +84,12 @@ export const postsRouter = createTRPCRouter({
 					let [newAuthor] = await ctx.db
 						.select()
 						.from(authors)
-						.where(eq(author, authors.name));
+						.where(eq(author.name, authors.name));
 					if (!newAuthor) {
 						[newAuthor] = await ctx.db
 							.insert(authors)
 							.values({
-								name: author,
+								name: author.name,
 							})
 							.returning();
 					}
@@ -142,7 +142,9 @@ export const postsRouter = createTRPCRouter({
 				});
 			}
 
-			const [formattedPost] = formatPosts([post]);
+			const [formattedPost] = await formatPosts([post]);
+
+			return formattedPost;
 		}),
 
 	getAll: publicProcedure.query(async ({ ctx }) => {
@@ -196,5 +198,43 @@ export const postsRouter = createTRPCRouter({
 			const formattedPosts = formatPosts(userPosts);
 
 			return formattedPosts;
+		}),
+
+	getByBookId: publicProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const bookPosts = await ctx.db.query.posts.findMany({
+				where: eq(parseInt(input.id), posts.bookId),
+			});
+
+			const users = await clerkClient.users.getUserList({
+				userId: bookPosts.map((post) => post.posterId),
+			});
+
+			const postsWithPosters = bookPosts.map((post) => {
+				const poster = users.find((user) => user.id === post.posterId);
+
+				if (!poster) {
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Poster not found",
+					});
+				}
+
+				return {
+					...post,
+					poster: {
+						id: poster.id,
+						username: poster.username,
+						imageUrl: poster.imageUrl,
+					},
+				};
+			});
+
+			return postsWithPosters;
 		}),
 });

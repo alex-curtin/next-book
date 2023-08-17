@@ -3,13 +3,14 @@ import { TRPCError } from "@trpc/server";
 import axios, { AxiosResponse } from "axios";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { DEFAULT_IMG_URL } from "~/constants";
 
 const BASE_URL = "https://www.googleapis.com/books/v1/volumes";
 
 type GoogleBooksResult = {
 	id: string;
 	volumeInfo: {
-		authors: string[];
+		authors?: string[];
 		imageLinks: {
 			thumbnail: string;
 		};
@@ -20,7 +21,7 @@ type GoogleBooksResult = {
 
 export type Book = {
 	authors: string[];
-	imgUrl: string;
+	imageUrl: string;
 	title: string;
 	subtitle: string;
 	googleId: string;
@@ -30,8 +31,8 @@ const transformBooks = (books: GoogleBooksResult[]): Book[] => {
 	return books.map((book) => {
 		const { volumeInfo, id } = book;
 		return {
-			authors: volumeInfo?.authors || [],
-			imgUrl: volumeInfo?.imageLinks?.thumbnail,
+			authors: volumeInfo?.authors?.map((author) => ({ name: author })) || [],
+			imageUrl: volumeInfo?.imageLinks?.thumbnail || DEFAULT_IMG_URL,
 			title: volumeInfo?.title,
 			subtitle: volumeInfo?.subtitle || null,
 			googleId: id,
@@ -51,6 +52,7 @@ export const googleApiRouter = createTRPCRouter({
 			const { data } = await axios.get(
 				`${BASE_URL}?q=${input.term}&key=${process.env.GOOGLE_API_KEY}`,
 			);
+			console.log("google books search", data.items);
 
 			return transformBooks(data.items);
 		}),
@@ -61,8 +63,8 @@ export const googleApiRouter = createTRPCRouter({
 			const { data } = await axios.get(
 				`${BASE_URL}/${input.id}?key=${process.env.GOOGLE_API_KEY}`,
 			);
-			const transformedBooks = transformBooks([data]);
+			const [transformedBook] = transformBooks([data]);
 
-			return transformedBooks[0];
+			return transformedBook;
 		}),
 });

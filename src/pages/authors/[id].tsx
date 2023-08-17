@@ -6,13 +6,15 @@ import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 import PageLayout from "~/components/layout";
 import BookItem from "~/components/book-item";
 import PostItem from "~/components/post-item";
+import NotFound from "~/components/not-found";
+import { LoadingPage } from "~/components/loading";
 
 const SingleAuthorPage = ({ id }: { id: string }) => {
 	const { data: author, isLoading } = api.authors.getAllPostsBy.useQuery({
 		id,
 	});
-	if (isLoading) return <div>loading...</div>;
-	if (!author) return <div>404...can't find that author</div>;
+	if (isLoading) return <LoadingPage />;
+	if (!author) return <NotFound message="Author not found" />;
 
 	return (
 		<PageLayout>

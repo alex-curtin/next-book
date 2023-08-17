@@ -1,4 +1,4 @@
-import { PropsWithChildren, use } from "react";
+import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { useUser, SignOutButton } from "@clerk/nextjs";
 
@@ -48,7 +48,7 @@ const NavBar = () => {
 const PageLayout = (props: PropsWithChildren) => {
 	return (
 		<div className="h-screen overflow-y-auto">
-			<NavBar />
+			{/* <NavBar /> */}
 			<main className="flex flex-col items-center pt-16">
 				<div className="w-full">{props.children}</div>
 			</main>

@@ -10,6 +10,7 @@ import SearchIcon from "~/components/ui/icons/search-icon";
 import { DEFAULT_IMG_URL } from "~/constants";
 import { api } from "~/utils/api";
 import PageLayout from "~/components/layout";
+import BookItem from "~/components/book-item";
 
 const SearchBooksPage = () => {
 	const [searchTerm, setSearchTerm] = useState("");
@@ -29,7 +30,7 @@ const SearchBooksPage = () => {
 
 	return (
 		<PageLayout>
-			<div className="flex min-h-screen flex-col items-center justify-start p-24 gap-4">
+			<div className="flex min-h-screen flex-col items-center justify-start p-8 gap-4">
 				<div className="flex items-center gap-1">
 					<Input
 						type="text"
@@ -42,23 +43,14 @@ const SearchBooksPage = () => {
 						<SearchIcon />
 					</Button>
 				</div>
-				<div className="flex flex-col gap-2">
+				<div className="flex flex-col gap-4">
 					{data?.map((book) => (
 						<Link
 							key={book.googleId}
-							className="flex gap-1"
+							className="flex gap-1 pr-2 py-1 hover:bg-black/10 transition"
 							href={`/books/${book.googleId}`}
 						>
-							<Image
-								src={book.imgUrl || DEFAULT_IMG_URL}
-								height={128}
-								width={128}
-								alt={book.title}
-							/>
-							<div className="p-2">
-								<p>{book.title}</p>
-								<p className="text-sm text-black/80">{book.authors[0]}</p>
-							</div>
+							<BookItem book={book} />
 						</Link>
 					))}
 				</div>

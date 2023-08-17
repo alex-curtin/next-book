@@ -16,7 +16,7 @@ type GoogleBooksResult = {
 
 export type Book = {
 	authors: string[];
-	imgUrl: string;
+	imageUrl: string;
 	title: string;
 	subtitle: string;
 	googleId: string;
