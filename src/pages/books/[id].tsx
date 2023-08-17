@@ -13,6 +13,9 @@ import Link from "next/link";
 import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 import { api } from "~/utils/api";
 import PageLayout from "~/components/layout";
+import NotFound from "~/components/not-found";
+import BookItem from "~/components/book-item";
+import PostItem from "~/components/post-item";
 
 const AddPost = ({ book }: { book: Book }) => {
 	const router = useRouter();
@@ -27,12 +30,12 @@ const AddPost = ({ book }: { book: Book }) => {
 
 	const onClickCreate = async () => {
 		if (postContent.length) {
-			console.log(postContent);
+			console.log("imageUrl", book.imageUrl);
 			await mutate({
 				book: {
 					title: book.title,
 					subtitle: book.subtitle || "",
-					imageUrl: book.imgUrl,
+					imageUrl: book.imageUrl || DEFAULT_IMG_URL,
 					googleId: book.googleId,
 				},
 				authors: book.authors,
@@ -59,11 +62,11 @@ const AddPost = ({ book }: { book: Book }) => {
 				cols="60"
 				rows="10"
 				value={postContent}
-				placeholder="Write a review"
+				placeholder="Write a post about this book"
 				onChange={(e) => setPostContent(e.target.value)}
 			/>
 			<Button onClick={onClickCreate} disabled={!postContent.length}>
-				Create Review
+				Post
 			</Button>
 		</div>
 	);
@@ -73,31 +76,30 @@ const SingleBookPage = ({ id }: { id: string }) => {
 	const { isSignedIn } = useUser();
 	const { data: book } = api.googleApi.getBookById.useQuery({ id });
 
-	if (!book) return <div>404...can't find that book</div>;
+	if (!book) return <NotFound message="Book not found" />;
+
+	const { data: posts } = api.books.getBookPostsByGoogleId.useQuery({
+		googleId: book.googleId,
+	});
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col items-center p-4 gap-2">
-				<div className="flex gap-2">
-					<Image
-						src={book.imgUrl || DEFAULT_IMG_URL}
-						width={96}
-						height={96}
-						alt={book.title}
-					/>
+			<div className="flex flex-col items-center p-4 max-w-2xl m-auto">
+				<div className="flex flex-col p-4 gap-4">
+					<BookItem book={book} />
+					{isSignedIn ? (
+						<AddPost book={book} />
+					) : (
+						<div>
+							<Link href="/signin">Sign in</Link> to create a post
+						</div>
+					)}
 					<div>
-						<h2 className="text-xl">{book.title}</h2>
-						<h3>{book.subtitle}</h3>
-						<p className="text-black/80">{book.authors.join(" | ")}</p>
+						{posts?.map((post) => (
+							<PostItem key={post.id} post={post} />
+						))}
 					</div>
 				</div>
-				{isSignedIn ? (
-					<AddPost book={book} />
-				) : (
-					<div>
-						<Link href="/signin">Sign in</Link> to create a post
-					</div>
-				)}
 			</div>
 		</PageLayout>
 	);
