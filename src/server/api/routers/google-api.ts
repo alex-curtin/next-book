@@ -7,6 +7,8 @@ import { DEFAULT_IMG_URL } from "~/constants";
 
 const BASE_URL = "https://www.googleapis.com/books/v1/volumes";
 
+const cleanHTMLString = (str: string) => str.replace(/<\/?[^>]+(>|$)/g, "");
+
 type GoogleBooksResult = {
 	id: string;
 	volumeInfo: {
@@ -16,6 +18,7 @@ type GoogleBooksResult = {
 		};
 		title: string;
 		subtitle: string | null;
+		description?: string;
 	};
 };
 
@@ -25,6 +28,7 @@ export type Book = {
 	title: string;
 	subtitle: string;
 	googleId: string;
+	description: string;
 };
 
 const transformBooks = (books: GoogleBooksResult[]): Book[] => {
@@ -36,6 +40,9 @@ const transformBooks = (books: GoogleBooksResult[]): Book[] => {
 			title: volumeInfo?.title,
 			subtitle: volumeInfo?.subtitle || null,
 			googleId: id,
+			description: volumeInfo.description
+				? cleanHTMLString(volumeInfo.description)
+				: "",
 		};
 	});
 };
@@ -49,9 +56,10 @@ export const googleApiRouter = createTRPCRouter({
 		)
 		.query(async ({ input }) => {
 			if (!input.term) return;
-			const { data } = await axios.get(
-				`${BASE_URL}?q=${input.term}&key=${process.env.GOOGLE_API_KEY}`,
-			);
+			const { data }: { data: { items: GoogleBooksResult[] } } =
+				await axios.get(
+					`${BASE_URL}?q=${input.term}&key=${process.env.GOOGLE_API_KEY}`,
+				);
 
 			return transformBooks(data.items);
 		}),
@@ -59,7 +67,7 @@ export const googleApiRouter = createTRPCRouter({
 	getBookById: publicProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input }) => {
-			const { data } = await axios.get(
+			const { data }: { data: GoogleBooksResult } = await axios.get(
 				`${BASE_URL}/${input.id}?key=${process.env.GOOGLE_API_KEY}`,
 			);
 			const [transformedBook] = transformBooks([data]);

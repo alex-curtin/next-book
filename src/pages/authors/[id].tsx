@@ -25,9 +25,11 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 					<div key={bookData.id} className="flex flex-col p-4">
 						<BookItem book={bookData} />
 						<div>
-							{posts.map((post) => (
-								<PostItem key={post.id} post={post} />
-							))}
+							{posts
+								.sort((a, b) => b.createdAt - a.createdAt)
+								.map((post) => (
+									<PostItem key={post.id} post={post} />
+								))}
 						</div>
 					</div>
 				))}

@@ -13,7 +13,7 @@ const SearchLayout = ({ children }) => {
 	const onSubmit = (e) => {
 		e.preventDefault();
 		if (searchTerm) {
-			router.push(`/search/${searchTerm}`);
+			router.push(`/search?q=${searchTerm}`);
 		}
 	};
 
@@ -32,17 +32,6 @@ const SearchLayout = ({ children }) => {
 						<SearchIcon />
 					</Button>
 				</form>
-				{/* <div className="flex flex-col gap-4">
-							{data?.map((book) => (
-								<Link
-									key={book.googleId}
-									className="flex gap-1 pr-2 py-1 hover:bg-black/10 transition"
-									href={`/books/${book.googleId}`}
-								>
-									<BookItem book={book} />
-								</Link>
-							))}
-						</div> */}
 				{children}
 			</div>
 		</PageLayout>

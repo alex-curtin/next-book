@@ -17,7 +17,7 @@ const SearchResultsPage = ({ term }: { term: string }) => {
 	if (isLoading) return <LoadingPage />;
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex flex-col gap-4 max-w-2xl">
 			{searchResults?.map((book) => (
 				<Link
 					key={book.googleId}

@@ -57,6 +57,7 @@ export const postsRouter = createTRPCRouter({
 					title: z.string(),
 					subtitle: z.string().optional(),
 					googleId: z.string(),
+					description: z.string().optional(),
 				}),
 				authors: z.array(z.object({ name: z.string() })),
 				post: z.object({
@@ -78,6 +79,7 @@ export const postsRouter = createTRPCRouter({
 						subtitle: input.book.subtitle || "",
 						imageUrl: input.book.imageUrl,
 						googleId: input.book.googleId,
+						description: input.book.description || "",
 					})
 					.returning();
 				input.authors.forEach(async (author) => {

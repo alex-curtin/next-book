@@ -20,7 +20,7 @@ import PostItem from "~/components/post-item";
 const AddPost = ({ book }: { book: Book }) => {
 	const router = useRouter();
 	const [postContent, setPostContent] = useState("");
-	const [rating, setRating] = useState(1);
+	const [rating, setRating] = useState(3);
 	const { mutate } = api.posts.createPost.useMutation({
 		onSuccess: (post) => {
 			console.log("success");
@@ -37,6 +37,7 @@ const AddPost = ({ book }: { book: Book }) => {
 					subtitle: book.subtitle || "",
 					imageUrl: book.imageUrl || DEFAULT_IMG_URL,
 					googleId: book.googleId,
+					description: book.description || "",
 				},
 				authors: book.authors,
 				post: {
@@ -95,9 +96,11 @@ const SingleBookPage = ({ id }: { id: string }) => {
 						</div>
 					)}
 					<div>
-						{posts?.map((post) => (
-							<PostItem key={post.id} post={post} />
-						))}
+						{posts
+							?.sort((a, b) => b.createdAt - a.createdAt)
+							.map((post) => (
+								<PostItem key={post.id} post={post} />
+							))}
 					</div>
 				</div>
 			</div>

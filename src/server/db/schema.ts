@@ -13,7 +13,8 @@ export const books = pgTable("books", {
 	title: varchar("title").notNull(),
 	subtitle: varchar("subtitle"),
 	imageUrl: varchar("image_url"),
-	googleId: varchar("google_id"),
+	googleId: varchar("google_id").notNull(),
+	description: varchar("description"),
 	createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 	updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
