@@ -8,13 +8,16 @@ import {
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
+import ProfileIcon from "./ui/icons/profile-icon";
+import SignOutIcon from "./ui/icons/signout-icon";
 
 const NavBar = () => {
 	const { user } = useUser();
 
 	return (
-		<nav className="w-full flex justify-between items-center px-8 py-2 bg-orange-300 fixed">
+		<nav className="w-full flex justify-between items-center px-8 py-2 bg-green-300 fixed">
 			<Link href="/">
 				<BookIcon />
 			</Link>
@@ -31,9 +34,21 @@ const NavBar = () => {
 								</AvatarFallback>
 							</Avatar>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent sideOffset={10}>
+						<DropdownMenuContent>
 							<DropdownMenuItem>
-								<SignOutButton />
+								<Link href="/profile" className="flex gap-1 items-center">
+									<ProfileIcon />
+									<span>Profile</span>
+								</Link>
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem>
+								<SignOutButton>
+									<button type="button" className="flex gap-1 items-center">
+										<SignOutIcon />
+										<span>Sign Out</span>
+									</button>
+								</SignOutButton>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
