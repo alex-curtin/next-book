@@ -61,6 +61,15 @@ export const comments = pgTable("comments", {
 	createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
+export const follows = pgTable(
+	"follows",
+	{
+		followerId: varchar("follower_id").notNull(),
+		followedId: varchar("followed_id").notNull(),
+	},
+	(t) => ({ pk: primaryKey(t.followedId, t.followerId) }),
+);
+
 export const bookRelations = relations(books, ({ many }) => ({
 	bookAuthors: many(bookAuthors),
 	posts: many(posts),

@@ -15,6 +15,20 @@
       "when": 1692328437587,
       "tag": "0001_hot_toad",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1692456492138,
+      "tag": "0002_fat_scarlet_spider",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1692456826110,
+      "tag": "0003_youthful_deathbird",
+      "breakpoints": true
     }
   ]
 }

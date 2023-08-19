@@ -17,7 +17,7 @@ const NavBar = () => {
 	const { user } = useUser();
 
 	return (
-		<nav className="w-full flex justify-between items-center px-8 py-2 bg-green-300 fixed">
+		<nav className="w-full z-50 flex justify-between items-center px-8 py-2 bg-green-300 fixed">
 			<Link href="/">
 				<BookIcon />
 			</Link>
