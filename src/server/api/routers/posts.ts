@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { eq, asc, desc } from "drizzle-orm";
+import { eq, asc, desc, inArray } from "drizzle-orm";
 import { auth, clerkClient } from "@clerk/nextjs";
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
@@ -11,6 +11,7 @@ import {
 	posts,
 	type Post,
 	type PostWithBooksAndAuthors,
+	follows,
 } from "~/server/db/schema";
 
 const formatPosts = async (posts: PostWithBooksAndAuthors[]) => {
@@ -239,4 +240,36 @@ export const postsRouter = createTRPCRouter({
 
 			return postsWithPosters;
 		}),
+
+	getUserFeed: privateProcedure.query(async ({ ctx }) => {
+		const following = await ctx.db.query.follows.findMany({
+			where: eq(ctx.userId, follows.followerId),
+		});
+
+		const followinIds = following.map((f) => f.followedId);
+
+		const postFeed = await ctx.db.query.posts.findMany({
+			where: inArray(posts.posterId, [...followinIds, ctx.userId]),
+			orderBy: [desc(posts.createdAt)],
+			with: {
+				book: {
+					with: {
+						bookAuthors: {
+							columns: {
+								bookId: false,
+								authorId: false,
+							},
+							with: {
+								author: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
+		const formattedFeed = await formatPosts(postFeed);
+
+		return formattedFeed;
+	}),
 });

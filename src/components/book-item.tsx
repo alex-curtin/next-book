@@ -12,8 +12,8 @@ const truncateString = (str: string, maxLength = 500) =>
 const BookItem = ({ book }: { book: BookWithAuthors }) => {
 	const router = useRouter();
 	const description =
-		router.pathname === "/search"
-			? truncateString(book.description)
+		router.pathname !== "/books/[id]"
+			? truncateString(book.description || "")
 			: book.description;
 
 	return (

@@ -58,4 +58,31 @@ export const booksRouter = createTRPCRouter({
 
 			return postsWithPosters;
 		}),
+
+	getAll: publicProcedure.query(async ({ ctx }) => {
+		const data = await ctx.db.query.books.findMany({
+			orderBy: [desc(books.createdAt)],
+			with: {
+				bookAuthors: {
+					with: {
+						author: true,
+					},
+				},
+				posts: true,
+			},
+		});
+
+		const transformedBooks = data.map((book) => {
+			const { bookAuthors, posts, ...bookData } = book;
+			return {
+				bookData: {
+					...bookData,
+					authors: bookAuthors.map((b) => b.author),
+				},
+				posts,
+			};
+		});
+
+		return transformedBooks;
+	}),
 });

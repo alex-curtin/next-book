@@ -6,6 +6,7 @@ import BookItem from "~/components/book-item";
 import { LoadingPage } from "~/components/loading";
 import SearchLayout from "~/components/search-layout";
 import { api } from "~/utils/api";
+import { Button } from "~/components/ui/button";
 
 const SearchPage = () => {
 	const search = useSearchParams();
@@ -16,27 +17,23 @@ const SearchPage = () => {
 		{ refetchOnWindowFocus: false, enabled: !!searchTerm },
 	);
 
-	if (isLoading) {
+	if (isLoading && searchTerm) {
 		return <LoadingPage />;
 	}
 
 	if (searchResults) {
 		return (
-			<div className="flex flex-col gap-4 max-w-2xl">
+			<div className="flex flex-col gap-6 max-w-2xl">
 				{searchResults?.map((book) => (
-					<Link
-						key={book.googleId}
-						className="flex gap-1 pr-2 py-1 hover:bg-black/10 transition"
-						href={`/books/${book.googleId}`}
-					>
+					<div key={book.googleId} className="flex gap-2 pr-2 py-1">
 						<BookItem book={book} />
-					</Link>
+					</div>
 				))}
 			</div>
 		);
 	}
 
-	return <></>;
+	return null;
 };
 
 export default SearchPage;

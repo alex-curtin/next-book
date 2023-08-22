@@ -1,40 +1,45 @@
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/router";
-
 import PageLayout from "~/components/layout";
 import { api } from "~/utils/api";
 import PostItem from "~/components/post-item";
 import BookItem from "~/components/book-item";
-import { LoadSpinner, LoadingPage } from "~/components/loading";
+import { LoadSpinner } from "~/components/loading";
+import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 
-const Home = () => {
-	const router = useRouter();
-	const { isSignedIn, isLoaded } = useUser();
-
-	if (isSignedIn) {
-		router.push("/feed");
-	}
-
+const AllPostsPage = () => {
 	const { data: postsData, isLoading } = api.posts.getAll.useQuery();
 
 	return (
 		<PageLayout>
 			<div className="flex flex-col items-center p-4 max-w-2xl mx-auto">
-				<h2 className="font-bold">Latest Posts</h2>
+				<h2 className="font-bold">Recent Posts</h2>
 				{isLoading && <LoadSpinner />}
-				{postsData?.length && (
+				{postsData?.length ? (
 					<div className="flex flex-col gap-2">
 						{postsData.map(({ post, book }) => (
-							<div key={book.id}>
+							<div key={post.id}>
 								<BookItem book={book} />
 								<PostItem post={post} />
 							</div>
 						))}
 					</div>
+				) : (
+					<p>No posts</p>
 				)}
 			</div>
 		</PageLayout>
 	);
 };
 
-export default Home;
+export default AllPostsPage;
+
+export const getServerSideProps = async () => {
+	const ssHelper = generateSSHelper();
+
+	await ssHelper.posts.getAll.prefetch();
+
+	return {
+		props: {
+			trpcState: ssHelper.dehydrate(),
+		},
+	};
+};

@@ -41,7 +41,7 @@ const PostItem = ({ post }: { post: PostWithPoster }) => {
 						<StarIcon filled={i < post.rating} key={i} />
 					))}
 				</div>
-				<div className="bg-black/10 w-full px-4 py-2 min-h-[96px]">
+				<div className="bg-black/10 w-full px-4 py-2 min-h-[96px] rounded-sm">
 					<p>{post.content}</p>
 				</div>
 			</div>
