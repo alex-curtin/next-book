@@ -32,7 +32,7 @@ export const booksRouter = createTRPCRouter({
 			const postsWithPosters = data.posts.map((post) => {
 				const poster = users.find((user) => user.id === post.posterId);
 
-				if (!poster) {
+				if (!poster || !poster.username) {
 					throw new TRPCError({
 						code: "INTERNAL_SERVER_ERROR",
 						message: "Poster not found",

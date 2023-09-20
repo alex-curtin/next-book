@@ -78,7 +78,7 @@ export const authorsRouter = createTRPCRouter({
 						const poster = filteredUsers.find(
 							(user) => user.id === post.posterId,
 						);
-						if (!poster) {
+						if (!poster || !poster.username) {
 							throw new TRPCError({
 								code: "INTERNAL_SERVER_ERROR",
 								message: "Poster not found",
@@ -87,7 +87,11 @@ export const authorsRouter = createTRPCRouter({
 
 						return {
 							...post,
-							poster,
+							poster: {
+								id: poster.id,
+								username: poster.username,
+								imageUrl: poster.imageUrl,
+							},
 						};
 					}),
 				};

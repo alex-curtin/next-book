@@ -22,14 +22,12 @@ const AddPost = ({ book }: { book: Book }) => {
 	const [rating, setRating] = useState(3);
 	const { mutate } = api.posts.createPost.useMutation({
 		onSuccess: (post) => {
-			console.log("success");
 			router.push(`/posts/${post.id}`);
 		},
 	});
 
 	const onClickCreate = async () => {
 		if (postContent.length) {
-			console.log("imageUrl", book.imageUrl);
 			await mutate({
 				book: {
 					title: book.title,
