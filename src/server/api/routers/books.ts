@@ -1,17 +1,10 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { eq, asc, desc } from "drizzle-orm";
-import { auth, clerkClient } from "@clerk/nextjs";
+import { eq, desc } from "drizzle-orm";
+import { clerkClient } from "@clerk/nextjs";
 
-import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
-import {
-	books,
-	authors,
-	bookAuthors,
-	posts,
-	type Post,
-	type PostWithBooksAndAuthors,
-} from "~/server/db/schema";
+import { createTRPCRouter, publicProcedure } from "../trpc";
+import { books } from "~/server/db/schema";
 
 export const booksRouter = createTRPCRouter({
 	getBookPostsByGoogleId: publicProcedure

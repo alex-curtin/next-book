@@ -32,7 +32,7 @@ const NavBar = () => {
 							<Avatar>
 								<AvatarImage src={user.imageUrl} />
 								<AvatarFallback>
-									{user.username[0].toUpperCase() || ""}
+									{user.username ? user.username[0].toUpperCase() : ""}
 								</AvatarFallback>
 							</Avatar>
 						</DropdownMenuTrigger>

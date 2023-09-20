@@ -3,7 +3,6 @@ import PageLayout from "~/components/layout";
 import { LoadingPage } from "~/components/loading";
 import BookItem from "~/components/book-item";
 import StarIcon from "~/components/ui/icons/star-icon";
-import Link from "next/link";
 
 const AllBooksPage = () => {
 	const { data, isLoading } = api.books.getAll.useQuery();

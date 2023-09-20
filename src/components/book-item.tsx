@@ -2,14 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
+import { type Book } from "~/server/api/routers/google-api";
 import { RouterOutputs } from "~/utils/api";
+import { DEFAULT_IMG_URL } from "~/constants";
 
 type BookWithAuthors = RouterOutputs["posts"]["getAll"][number]["book"];
 
 const truncateString = (str: string, maxLength = 500) =>
 	str.length <= maxLength ? str : `${str.slice(0, maxLength - 3)}...`;
 
-const BookItem = ({ book }: { book: BookWithAuthors }) => {
+const BookItem = ({ book }: { book: Book | BookWithAuthors }) => {
 	const router = useRouter();
 	const description =
 		router.pathname !== "/books/[id]"
@@ -21,7 +23,7 @@ const BookItem = ({ book }: { book: BookWithAuthors }) => {
 			<Link href={`/books/${book.googleId}`}>
 				<div className="w-[128px]">
 					<Image
-						src={book.imageUrl}
+						src={book.imageUrl || DEFAULT_IMG_URL}
 						alt={book.title}
 						width={128}
 						height={128}

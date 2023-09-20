@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
 
-import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 import { follows } from "~/server/db/schema";
 
 export const usersRouter = createTRPCRouter({
@@ -12,12 +12,19 @@ export const usersRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const user = await clerkClient.users.getUser(input.id);
 
+			if (!user.username) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Username not found",
+				});
+			}
+
 			const followers = await ctx.db.query.follows.findMany({
-				where: eq(user.id, follows.followedId),
+				where: eq(follows.followedId, user.id),
 			});
 
 			const following = await ctx.db.query.follows.findMany({
-				where: eq(user.id, follows.followerId),
+				where: eq(follows.followerId, user.id),
 			});
 
 			const followerIds = followers.map((f) => f.followerId);

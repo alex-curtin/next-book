@@ -10,6 +10,7 @@ import BookItem from "~/components/book-item";
 import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { LoadSpinner } from "~/components/loading";
+import NotFound from "~/components/not-found";
 
 const FollowButton = ({
 	following,
@@ -66,6 +67,8 @@ const SingleUserPage = ({ id }: { id: string }) => {
 		id,
 	});
 
+	if (!user) return <NotFound message="User not found" />;
+
 	const { user: currentUser } = useUser();
 
 	return (
@@ -85,7 +88,8 @@ const SingleUserPage = ({ id }: { id: string }) => {
 								<div className="text-sm text-black/80">
 									<p>joined {dayjs(user.createdAt).format("MMM DD, YYYY")}</p>
 									<p>
-										{postsData.length} post{postsData?.length === 1 ? "" : "s"}
+										{postsData?.length || 0} post
+										{postsData?.length === 1 ? "" : "s"}
 									</p>
 									<p>
 										{user.followers.length} follower
@@ -124,8 +128,12 @@ const SingleUserPage = ({ id }: { id: string }) => {
 export default SingleUserPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const { id } = context.params;
 	const ssHelper = generateSSHelper();
+	const id = context.params?.id;
+
+	if (typeof id !== "string") {
+		throw new Error("Missing id");
+	}
 
 	await ssHelper.users.getById.prefetch({ id });
 	await ssHelper.posts.getAllByUser.prefetch({ id });

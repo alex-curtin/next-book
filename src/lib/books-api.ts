@@ -15,11 +15,12 @@ type GoogleBooksResult = {
 };
 
 export type Book = {
-	authors: string[];
+	authors: { name: string; id: number }[];
 	imageUrl: string;
 	title: string;
 	subtitle: string;
 	googleId: string;
+	description: string;
 };
 
 const transformBooks = (books: GoogleBooksResult[]): Book[] => {

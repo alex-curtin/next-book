@@ -26,7 +26,7 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 						<BookItem book={bookData} />
 						<div>
 							{posts
-								.sort((a, b) => b.createdAt - a.createdAt)
+								.sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
 								.map((post) => (
 									<PostItem key={post.id} post={post} />
 								))}
@@ -41,8 +41,12 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 export default SingleAuthorPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const { id } = context.params;
 	const ssHelper = generateSSHelper();
+	const id = context?.params?.id;
+
+	if (typeof id !== "string") {
+		throw new Error("Missing id");
+	}
 
 	await ssHelper.authors.getAllPostsBy.prefetch({ id });
 

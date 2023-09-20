@@ -1,9 +1,7 @@
 import { z } from "zod";
-import { TRPCError } from "@trpc/server";
 import { eq, and } from "drizzle-orm";
-import { auth, clerkClient } from "@clerk/nextjs";
 
-import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
+import { createTRPCRouter, privateProcedure } from "../trpc";
 import { follows } from "~/server/db/schema";
 
 export const followsRouter = createTRPCRouter({

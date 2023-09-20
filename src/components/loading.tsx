@@ -1,6 +1,6 @@
 import PageLayout from "./layout";
 
-export const LoadSpinner = ({ size = 16 }: { size: number }) => {
+export const LoadSpinner = ({ size = 16 }: { size?: number }) => {
 	return (
 		<div role="status">
 			<svg

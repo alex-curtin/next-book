@@ -1,12 +1,10 @@
 import { GetServerSideProps } from "next";
-import Image from "next/image";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { clerkClient } from "@clerk/nextjs";
 
 import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 import { api } from "~/utils/api";
-import StarIcon from "~/components/ui/icons/star-icon";
+
 import PageLayout from "~/components/layout";
 import NotFound from "~/components/not-found";
 import BookItem from "~/components/book-item";
@@ -37,7 +35,11 @@ export default SinglePostPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const ssHelper = generateSSHelper();
-	const { id } = context.params;
+	const id = context.params?.id;
+
+	if (typeof id !== "string") {
+		throw new Error("Missing id");
+	}
 
 	await ssHelper.posts.getById.prefetch({ id });
 

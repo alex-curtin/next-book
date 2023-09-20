@@ -25,7 +25,7 @@ const Home = () => {
 				{postsData?.length && (
 					<div className="flex flex-col gap-2">
 						{postsData.map(({ post, book }) => (
-							<div key={book.id}>
+							<div key={post.id}>
 								<BookItem book={book} />
 								<PostItem post={post} />
 							</div>

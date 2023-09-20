@@ -1,16 +1,14 @@
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 
-import PageLayout from "~/components/layout";
 import BookItem from "~/components/book-item";
 import { LoadingPage } from "~/components/loading";
 import SearchLayout from "~/components/search-layout";
 import { api } from "~/utils/api";
-import { Button } from "~/components/ui/button";
+import { type Page } from "./_app";
 
 const SearchPage = () => {
 	const search = useSearchParams();
-	const searchTerm = search.get("q");
+	const searchTerm = search.get("q") || "";
 
 	const { data: searchResults, isLoading } = api.googleApi.searchBooks.useQuery(
 		{ term: searchTerm },
@@ -38,6 +36,6 @@ const SearchPage = () => {
 
 export default SearchPage;
 
-SearchPage.getLayout = function getLayout(page) {
+SearchPage.getLayout = function getLayout(page: Page) {
 	return <SearchLayout>{page}</SearchLayout>;
 };

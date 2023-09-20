@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { eq, asc, desc, inArray } from "drizzle-orm";
-import { auth, clerkClient } from "@clerk/nextjs";
+import { eq, desc, inArray } from "drizzle-orm";
+import { clerkClient } from "@clerk/nextjs";
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
 import {
@@ -9,10 +9,36 @@ import {
 	authors,
 	bookAuthors,
 	posts,
-	type Post,
-	type PostWithBooksAndAuthors,
 	follows,
 } from "~/server/db/schema";
+
+type PostWithBooksAndAuthors = {
+	id: number;
+	createdAt: Date;
+	updatedAt: Date;
+	bookId: number;
+	posterId: string;
+	content: string;
+	rating: number;
+	book: {
+		id: number;
+		createdAt: Date | null;
+		updatedAt: Date | null;
+		title: string;
+		subtitle: string | null;
+		imageUrl: string | null;
+		googleId: string;
+		description: string | null;
+		bookAuthors: {
+			bookId: number;
+			authorId: number;
+			author: {
+				id: number;
+				name: string;
+			};
+		}[];
+	};
+};
 
 const formatPosts = async (posts: PostWithBooksAndAuthors[]) => {
 	const users = await clerkClient.users.getUserList({
@@ -22,7 +48,7 @@ const formatPosts = async (posts: PostWithBooksAndAuthors[]) => {
 	return posts.map((post) => {
 		const poster = users.find((user) => user.id === post.posterId);
 
-		if (!poster) {
+		if (!poster || !poster.username) {
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
 				message: "Poster not found",
@@ -71,7 +97,7 @@ export const postsRouter = createTRPCRouter({
 			let [book] = await ctx.db
 				.select()
 				.from(books)
-				.where(eq(input.book.googleId, books.googleId));
+				.where(eq(books.googleId, input.book.googleId));
 			if (!book) {
 				[book] = await ctx.db
 					.insert(books)
@@ -87,7 +113,7 @@ export const postsRouter = createTRPCRouter({
 					let [newAuthor] = await ctx.db
 						.select()
 						.from(authors)
-						.where(eq(author.name, authors.name));
+						.where(eq(authors.name, author.name));
 					if (!newAuthor) {
 						[newAuthor] = await ctx.db
 							.insert(authors)
@@ -120,15 +146,11 @@ export const postsRouter = createTRPCRouter({
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
 			const post = await ctx.db.query.posts.findFirst({
-				where: eq(parseInt(input.id), posts.id),
+				where: eq(posts.id, parseInt(input.id)),
 				with: {
 					book: {
 						with: {
 							bookAuthors: {
-								columns: {
-									bookId: false,
-									authorId: false,
-								},
 								with: {
 									author: true,
 								},
@@ -157,10 +179,6 @@ export const postsRouter = createTRPCRouter({
 				book: {
 					with: {
 						bookAuthors: {
-							columns: {
-								bookId: false,
-								authorId: false,
-							},
 							with: {
 								author: true,
 							},
@@ -179,16 +197,12 @@ export const postsRouter = createTRPCRouter({
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
 			const userPosts = await ctx.db.query.posts.findMany({
-				where: eq(input.id, posts.posterId),
+				where: eq(posts.posterId, input.id),
 				orderBy: [desc(posts.createdAt)],
 				with: {
 					book: {
 						with: {
 							bookAuthors: {
-								columns: {
-									bookId: false,
-									authorId: false,
-								},
 								with: {
 									author: true,
 								},
@@ -211,7 +225,7 @@ export const postsRouter = createTRPCRouter({
 		)
 		.query(async ({ ctx, input }) => {
 			const bookPosts = await ctx.db.query.posts.findMany({
-				where: eq(parseInt(input.id), posts.bookId),
+				where: eq(posts.bookId, parseInt(input.id)),
 			});
 
 			const users = await clerkClient.users.getUserList({
@@ -243,7 +257,7 @@ export const postsRouter = createTRPCRouter({
 
 	getUserFeed: privateProcedure.query(async ({ ctx }) => {
 		const following = await ctx.db.query.follows.findMany({
-			where: eq(ctx.userId, follows.followerId),
+			where: eq(follows.followerId, ctx.userId),
 		});
 
 		const followinIds = following.map((f) => f.followedId);
@@ -255,10 +269,6 @@ export const postsRouter = createTRPCRouter({
 				book: {
 					with: {
 						bookAuthors: {
-							columns: {
-								bookId: false,
-								authorId: false,
-							},
 							with: {
 								author: true,
 							},
@@ -272,4 +282,18 @@ export const postsRouter = createTRPCRouter({
 
 		return formattedFeed;
 	}),
+
+	editPostContent: privateProcedure
+		.input(
+			z.object({
+				id: z.number(),
+				content: z.string(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const updatedPost = await ctx.db
+				.update(posts)
+				.set({ content: input.content, updatedAt: new Date() })
+				.where(eq(posts.id, input.id));
+		}),
 });

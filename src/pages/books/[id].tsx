@@ -1,12 +1,11 @@
 import { type GetServerSideProps } from "next";
-import Image from "next/image";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 
 import { DEFAULT_IMG_URL } from "~/constants";
 import { Textarea } from "~/components/ui/textarea";
-import { type Book, getBookById, searchBooks } from "~/lib/books-api";
+import { type Book } from "~/server/api/routers/google-api";
 import { Button } from "~/components/ui/button";
 import StarIcon from "~/components/ui/icons/star-icon";
 import Link from "next/link";
@@ -60,8 +59,8 @@ const AddPost = ({ book }: { book: Book }) => {
 			</div>
 			<Textarea
 				name="post"
-				cols="60"
-				rows="10"
+				cols={60}
+				rows={10}
 				value={postContent}
 				placeholder="Write a post about this book"
 				onChange={(e) => setPostContent(e.target.value)}
@@ -97,7 +96,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 					)}
 					<div>
 						{posts
-							?.sort((a, b) => b.createdAt - a.createdAt)
+							?.sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
 							.map((post) => (
 								<PostItem key={post.id} post={post} />
 							))}
@@ -112,9 +111,9 @@ export default SingleBookPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const ssHelper = generateSSHelper();
-	const id = context.params.id;
+	const id = context.params?.id;
 
-	if (!id) throw new Error("no id");
+	if (typeof id !== "string") throw new Error("Missing id");
 
 	await ssHelper.googleApi.getBookById.prefetch({ id });
 

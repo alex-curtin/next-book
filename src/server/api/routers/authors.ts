@@ -1,17 +1,10 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { eq, asc, desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs";
 
-import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
-import {
-	books,
-	authors,
-	bookAuthors,
-	posts,
-	type Post,
-	type PostWithBooksAndAuthors,
-} from "~/server/db/schema";
+import { createTRPCRouter, publicProcedure } from "../trpc";
+import { authors, type Post } from "~/server/db/schema";
 
 const addUsersToPosts = async (posts: Post[]) => {
 	const users = await clerkClient.users.getUserList({
@@ -37,7 +30,7 @@ export const authorsRouter = createTRPCRouter({
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
 			const author = await ctx.db.query.authors.findFirst({
-				where: eq(parseInt(input.id), authors.id),
+				where: eq(authors.id, parseInt(input.id)),
 				with: {
 					bookAuthors: {
 						with: {
@@ -81,10 +74,22 @@ export const authorsRouter = createTRPCRouter({
 						...bookData,
 						authors: bookAuthors.map((b) => b.author),
 					},
-					posts: posts.map((post) => ({
-						...post,
-						poster: filteredUsers.find((user) => user.id === post.posterId),
-					})),
+					posts: posts.map((post) => {
+						const poster = filteredUsers.find(
+							(user) => user.id === post.posterId,
+						);
+						if (!poster) {
+							throw new TRPCError({
+								code: "INTERNAL_SERVER_ERROR",
+								message: "Poster not found",
+							});
+						}
+
+						return {
+							...post,
+							poster,
+						};
+					}),
 				};
 			});
 

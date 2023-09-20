@@ -47,8 +47,12 @@ export const posts = pgTable("posts", {
 	posterId: varchar("poster_id").notNull(),
 	content: varchar("content").notNull(),
 	rating: integer("rating").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-	updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+	createdAt: timestamp("created_at", { withTimezone: true })
+		.defaultNow()
+		.notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true })
+		.defaultNow()
+		.notNull(),
 });
 
 export const comments = pgTable("comments", {

@@ -23,7 +23,7 @@ type GoogleBooksResult = {
 };
 
 export type Book = {
-	authors: string[];
+	authors: { name: string; id?: number }[];
 	imageUrl: string;
 	title: string;
 	subtitle: string;
@@ -38,7 +38,7 @@ const transformBooks = (books: GoogleBooksResult[]): Book[] => {
 			authors: volumeInfo?.authors?.map((author) => ({ name: author })) || [],
 			imageUrl: volumeInfo?.imageLinks?.thumbnail || DEFAULT_IMG_URL,
 			title: volumeInfo?.title,
-			subtitle: volumeInfo?.subtitle || null,
+			subtitle: volumeInfo?.subtitle || "",
 			googleId: id,
 			description: volumeInfo.description
 				? cleanHTMLString(volumeInfo.description)
