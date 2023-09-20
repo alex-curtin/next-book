@@ -283,17 +283,22 @@ export const postsRouter = createTRPCRouter({
 		return formattedFeed;
 	}),
 
-	editPostContent: privateProcedure
+	edit: privateProcedure
 		.input(
 			z.object({
 				id: z.number(),
 				content: z.string(),
+				rating: z.number(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const updatedPost = await ctx.db
 				.update(posts)
-				.set({ content: input.content, updatedAt: new Date() })
+				.set({
+					content: input.content,
+					rating: input.rating,
+					updatedAt: new Date(),
+				})
 				.where(eq(posts.id, input.id));
 		}),
 });
