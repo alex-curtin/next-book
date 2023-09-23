@@ -301,4 +301,16 @@ export const postsRouter = createTRPCRouter({
 				})
 				.where(eq(posts.id, input.id));
 		}),
+
+	delete: privateProcedure
+		.input(
+			z.object({
+				id: z.number(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const deletedPost = await ctx.db
+				.delete(posts)
+				.where(eq(posts.id, input.id));
+		}),
 });

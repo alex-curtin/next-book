@@ -2,6 +2,7 @@ import { type GetServerSideProps } from "next";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 import { DEFAULT_IMG_URL } from "~/constants";
 import { Textarea } from "~/components/ui/textarea";
@@ -22,13 +23,14 @@ const AddPost = ({ book }: { book: Book }) => {
 	const [rating, setRating] = useState(3);
 	const { mutate } = api.posts.createPost.useMutation({
 		onSuccess: (post) => {
+			toast("Post created!");
 			router.push(`/posts/${post.id}`);
 		},
 	});
 
-	const onClickCreate = async () => {
+	const onClickCreate = () => {
 		if (postContent.length) {
-			await mutate({
+			mutate({
 				book: {
 					title: book.title,
 					subtitle: book.subtitle || "",

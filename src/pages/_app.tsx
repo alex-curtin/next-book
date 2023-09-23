@@ -2,6 +2,7 @@ import type { AppProps } from "next/app";
 import { ReactNode } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { NextPage } from "next";
+import { Toaster } from "react-hot-toast";
 
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
@@ -16,6 +17,7 @@ const App = ({ Component, pageProps }: AppProps & { Component: Page }) => {
 	return (
 		<ClerkProvider>
 			<NavBar />
+			<Toaster position="bottom-center" />
 			{getLayout(<Component {...pageProps} />)}
 		</ClerkProvider>
 	);
