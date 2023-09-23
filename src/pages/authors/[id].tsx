@@ -1,11 +1,10 @@
 import { GetServerSideProps } from "next";
-import Image from "next/image";
 
 import { api } from "~/utils/api";
 import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 import PageLayout from "~/components/layout";
 import BookItem from "~/components/book-item";
-import PostItem from "~/components/post-item";
+import RatingSummary from "~/components/rating-summary";
 import NotFound from "~/components/not-found";
 import { LoadingPage } from "~/components/loading";
 
@@ -20,17 +19,11 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 	return (
 		<PageLayout>
 			<div className="flex flex-col items-center p-4 max-w-2xl m-auto">
-				<h2 className="text-lg font-semibold">{author.name}</h2>
+				<h2 className="text-lg font-semibold">Books by {author.name}</h2>
 				{author.books.map(({ bookData, posts }) => (
-					<div key={bookData.id} className="flex flex-col p-4">
+					<div key={bookData.id} className="flex flex-col p-4 w-full">
 						<BookItem book={bookData} />
-						<div>
-							{posts
-								.sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
-								.map((post) => (
-									<PostItem key={post.id} post={post} />
-								))}
-						</div>
+						<RatingSummary posts={posts} />
 					</div>
 				))}
 			</div>
