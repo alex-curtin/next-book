@@ -3,6 +3,7 @@ import PageLayout from "~/components/layout";
 import { LoadingPage } from "~/components/loading";
 import BookItem from "~/components/book-item";
 import RatingSummary from "~/components/rating-summary";
+import PageHeader from "~/components/ui/page-header";
 
 const AllBooksPage = () => {
 	const { data, isLoading } = api.books.getAll.useQuery();
@@ -14,7 +15,7 @@ const AllBooksPage = () => {
 	return (
 		<PageLayout>
 			<div className="flex flex-col items-center p-4 max-w-2xl m-auto gap-6">
-				<h2>Recently reviewed books</h2>
+				<PageHeader title="Recently reviewed books" />
 				{data?.map((book) => {
 					return (
 						<div key={book.bookData.id} className="w-full flex flex-col gap-1">

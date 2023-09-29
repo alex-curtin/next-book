@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Link from "next/link";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -15,6 +16,7 @@ type PostWithPoster = RouterOutputs["posts"]["getAll"][number]["post"];
 const PostItem = ({ post }: { post: PostWithPoster }) => {
 	const router = useRouter();
 	const isPostPage = router.pathname === "/posts/[id]";
+	const [isExpanded, setIsExpanded] = useState(isPostPage);
 	const content = isPostPage ? post.content : truncateString(post.content);
 
 	return (
@@ -48,18 +50,31 @@ const PostItem = ({ post }: { post: PostWithPoster }) => {
 
 				<div
 					className={`${
-						isPostPage ? "" : "max-h-[136px]"
+						isExpanded ? "" : "max-h-[136px]"
 					} bg-neutral-200 w-full min-w-[500px] px-4 py-2 min-h-[96px] rounded-sm overflow-hidden relative`}
 				>
-					<p className="text-ellipsis text-sm">{post.content}</p>
-					{!isPostPage && (
+					<Link href={`/posts/${post.id}`}>
+						<p className="text-ellipsis text-sm">{post.content}</p>
+					</Link>
+					{!isExpanded ? (
 						<div className="absolute bottom-0 right-0 w-full text-end bg-gradient-to-t from-neutral-200 via-50% via-neutral-200 to-transparent">
-							<Link
-								href={`/posts/${post.id}`}
-								className="text-black/80 px-4 pt-4 py-1 h-12 flex items-end justify-end"
+							<button
+								type="button"
+								className="text-black/80 w-full px-4 pt-4 py-1 h-12 flex items-end justify-end"
+								onClick={() => setIsExpanded(true)}
 							>
-								see full post
-							</Link>
+								see more
+							</button>
+						</div>
+					) : (
+						<div className="w-full text-end">
+							<button
+								type="button"
+								className="text-black/80 w-full px-4 py-1 flex items-end justify-end"
+								onClick={() => setIsExpanded(false)}
+							>
+								see less
+							</button>
 						</div>
 					)}
 				</div>

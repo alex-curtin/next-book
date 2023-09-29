@@ -5,6 +5,12 @@ import * as schema from "./schema";
 
 neonConfig.fetchConnectionCache = true;
 
-const sql = neon(process.env.DRIZZLE_DATABASE_URL);
+const dbUrl = process.env.DRIZZLE_DATABASE_URL;
+
+if (!dbUrl) {
+	throw new Error("DRIZZLE_DATABASE_URL is missing");
+}
+
+const sql = neon(dbUrl);
 
 export const db = drizzle(sql, { schema });

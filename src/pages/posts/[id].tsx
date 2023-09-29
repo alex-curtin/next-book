@@ -56,6 +56,7 @@ const EditPost = ({
 				content: postContent,
 				rating,
 			});
+			toast("Post updated");
 		}
 	};
 

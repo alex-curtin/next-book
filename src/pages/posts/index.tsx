@@ -5,13 +5,15 @@ import BookItem from "~/components/book-item";
 import { LoadSpinner } from "~/components/loading";
 import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 
+import PageHeader from "~/components/ui/page-header";
+
 const AllPostsPage = () => {
 	const { data: postsData, isLoading } = api.posts.getAll.useQuery();
 
 	return (
 		<PageLayout>
 			<div className="flex flex-col items-center p-4 max-w-2xl mx-auto">
-				<h2 className="font-bold">Recent Posts</h2>
+				<PageHeader title="Recent Posts" />
 				{isLoading && <LoadSpinner />}
 				{postsData?.length ? (
 					<div className="flex flex-col gap-2">
