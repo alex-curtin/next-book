@@ -43,6 +43,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	};
 };
 
-SearchResultsPage.getLayout = function getLayout(page) {
-	return <SearchLayout>{page}</SearchLayout>;
-};
+// SearchResultsPage.getLayout = function getLayout(page) {
+// 	return <SearchLayout>{page}</SearchLayout>;
+// };
