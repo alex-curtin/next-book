@@ -1,7 +1,7 @@
 import { useSearchParams } from "next/navigation";
 
 import BookItem from "~/components/book-item";
-import { LoadingPage, LoadSpinner } from "~/components/loading";
+import { LoadSpinner } from "~/components/loading";
 import SearchLayout from "~/components/search-layout";
 import { api } from "~/utils/api";
 
@@ -11,7 +11,7 @@ const SearchPage = () => {
 
 	const {
 		data: searchResults,
-		isLoading,
+		isFetching,
 		fetchNextPage,
 		isFetchingNextPage,
 	} = api.googleApi.searchBooks.useInfiniteQuery(
@@ -26,7 +26,7 @@ const SearchPage = () => {
 	return (
 		<SearchLayout>
 			<div className="flex flex-col gap-6 max-w-2xl">
-				{isLoading && <LoadSpinner size={48} />}
+				{isFetching && <LoadSpinner size={48} />}
 				{searchResults?.pages.map((page) => (
 					<>
 						{page?.books.map((book) => (
