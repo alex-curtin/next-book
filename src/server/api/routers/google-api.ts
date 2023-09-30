@@ -59,8 +59,6 @@ export const googleApiRouter = createTRPCRouter({
 		)
 		.query(async ({ input }) => {
 			if (!input.term) return;
-			console.log("page: ", input.pageParam);
-			console.log("cursor: ", input.cursor);
 			const { data }: { data: { items: GoogleBooksResult[] } } =
 				await axios.get(
 					`${BASE_URL}?q=${input.term}&maxResults=${
@@ -83,5 +81,25 @@ export const googleApiRouter = createTRPCRouter({
 			const [transformedBook] = transformBooks([data]);
 
 			return transformedBook;
+		}),
+
+	getBooksByAuthor: publicProcedure
+		.input(
+			z.object({
+				author: z.string(),
+			}),
+		)
+		.query(async ({ input }) => {
+			const { data }: { data: { items: GoogleBooksResult[] } } =
+				await axios.get(
+					`${BASE_URL}?q=${input.author}&maxResults=20&&key=${process.env.GOOGLE_API_KEY}`,
+				);
+
+			const transformedBooks = transformBooks(data.items);
+			const filteredBooks = transformedBooks.filter((book) =>
+				book.authors.some((author) => author.name === input.author),
+			);
+
+			return filteredBooks.slice(0, 10);
 		}),
 });
