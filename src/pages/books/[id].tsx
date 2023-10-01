@@ -16,6 +16,7 @@ import PageLayout from "~/components/layout";
 import NotFound from "~/components/not-found";
 import BookItem from "~/components/book-item";
 import PostItem from "~/components/post-item";
+import { LoadSpinner } from "~/components/loading";
 
 const AddPost = ({ book }: { book: Book }) => {
 	const router = useRouter();
@@ -82,11 +83,22 @@ const SingleBookPage = ({ id }: { id: string }) => {
 		googleId: book.googleId,
 	});
 
+	const {
+		data: recs,
+		error: recsError,
+		isLoading: isLoadingRecs,
+	} = api.googleApi.getRecommendations.useQuery(
+		{
+			book: `${book.title} by ${book.authors[0]}`,
+		},
+		{ retry: false },
+	);
+
 	return (
 		<PageLayout>
 			<div className="flex flex-col items-center p-4 max-w-2xl m-auto">
 				<div className="flex flex-col p-4 gap-4">
-					<BookItem book={book} />
+					<BookItem book={book} showFullDescription={true} />
 					{isSignedIn ? (
 						<AddPost book={book} />
 					) : (
@@ -101,6 +113,22 @@ const SingleBookPage = ({ id }: { id: string }) => {
 								<PostItem key={post.id} post={post} />
 							))}
 					</div>
+					{isLoadingRecs && <LoadSpinner size={24} />}
+					{recs && (
+						<div>
+							<h2 className="font-semibold mb-4">
+								Recommended for fans of this book:
+							</h2>
+							<div className="flex flex-col gap-4">
+								{recs?.map((book) => (
+									<BookItem book={book} key={book.googleId} />
+								))}
+							</div>
+						</div>
+					)}
+					{recsError && (
+						<h2>Error getting recommendations. Please try again later.</h2>
+					)}
 				</div>
 			</div>
 		</PageLayout>

@@ -1,9 +1,13 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import axios, { AxiosResponse } from "axios";
+import { OpenAI } from "openai";
+import { Redis } from "@upstash/redis";
 
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { DEFAULT_IMG_URL } from "~/constants";
+
+const redis = Redis.fromEnv();
 
 const BASE_URL = "https://www.googleapis.com/books/v1/volumes";
 
@@ -101,5 +105,64 @@ export const googleApiRouter = createTRPCRouter({
 			);
 
 			return filteredBooks.slice(0, 10);
+		}),
+
+	getRecommendations: publicProcedure
+		.input(
+			z.object({
+				book: z.string(),
+			}),
+		)
+		.query(async ({ input }) => {
+			const cache: Book[] | null = await redis.get(input.book);
+			if (cache) {
+				return cache;
+			}
+
+			const openai = new OpenAI({
+				apiKey: process.env.OPENAI_API_KEY,
+			});
+
+			console.log("requesting from OpenAI");
+			const response = await openai.chat.completions.create({
+				model: "gpt-3.5-turbo",
+				messages: [
+					{
+						role: "user",
+						content: `Please recomment 5 books for someone who liked ${input.book}. Format as a JSON array of strings, ie "[title - author]".`,
+					},
+				],
+				temperature: 1,
+				max_tokens: 256,
+			});
+
+			const recString = response.choices[0].message.content;
+
+			if (!recString) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to get recommendations",
+				});
+			}
+
+			const recsArray: string[] = JSON.parse(recString);
+
+			const googleBooks = await Promise.all(
+				recsArray.map((rec) => {
+					const response: Promise<{ data: { items: GoogleBooksResult[] } }> =
+						axios.get(
+							`${BASE_URL}?q=${rec}&maxResults=1&&key=${process.env.GOOGLE_API_KEY}`,
+						);
+					return response;
+				}),
+			);
+
+			const books = googleBooks.map((rec) => rec.data.items[0]);
+
+			const transformedBooks = transformBooks(books);
+
+			await redis.set(input.book, JSON.stringify(transformedBooks));
+
+			return transformedBooks;
 		}),
 });

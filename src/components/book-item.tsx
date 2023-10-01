@@ -11,17 +11,19 @@ type BookWithAuthors = RouterOutputs["posts"]["getAll"][number]["book"];
 const truncateString = (str: string, maxLength = 500) =>
 	str.length <= maxLength ? str : `${str.slice(0, maxLength - 3)}...`;
 
-const BookItem = ({ book }: { book: Book | BookWithAuthors }) => {
+const BookItem = ({
+	book,
+	showFullDescription = false,
+}: { book: Book | BookWithAuthors; showFullDescription?: boolean }) => {
 	const router = useRouter();
-	const description =
-		router.pathname !== "/books/[id]"
-			? truncateString(book.description || "")
-			: book.description;
+	const description = !showFullDescription
+		? truncateString(book.description || "")
+		: book.description;
 
 	return (
 		<div className="flex gap-2">
 			<Link href={`/books/${book.googleId}`}>
-				<div className="w-[128px]">
+				<div className="w-[128px] h-auto">
 					<Image
 						src={book.imageUrl || DEFAULT_IMG_URL}
 						alt={book.title}
