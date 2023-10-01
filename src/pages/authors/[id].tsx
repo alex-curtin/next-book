@@ -18,9 +18,11 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 	if (isLoading) return <LoadingPage />;
 	if (!author) return <NotFound message="Author not found" />;
 
+	const titles = author.books.map((book) => book.bookData.title);
 	const { data: googleBooks, isLoading: isLoadingGoogleBooks } =
 		api.googleApi.getBooksByAuthor.useQuery({
 			author: author.name,
+			titles,
 		});
 
 	return (

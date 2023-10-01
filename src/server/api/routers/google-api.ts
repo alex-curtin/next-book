@@ -91,6 +91,7 @@ export const googleApiRouter = createTRPCRouter({
 		.input(
 			z.object({
 				author: z.string(),
+				titles: z.array(z.string()),
 			}),
 		)
 		.query(async ({ input }) => {
@@ -100,9 +101,11 @@ export const googleApiRouter = createTRPCRouter({
 				);
 
 			const transformedBooks = transformBooks(data.items);
-			const filteredBooks = transformedBooks.filter((book) =>
-				book.authors.some((author) => author.name === input.author),
-			);
+			const filteredBooks = transformedBooks
+				.filter((book) =>
+					book.authors.some((author) => author.name === input.author),
+				)
+				.filter((book) => !input.titles.includes(book.title));
 
 			return filteredBooks.slice(0, 10);
 		}),

@@ -24,8 +24,8 @@ const NavBar = () => {
 			</Link>
 			<div className="flex gap-8 items-center">
 				{user && <Link href={`/users/${user.id}`}>My Posts</Link>}
-				<Link href="/posts">Browse Posts</Link>
-				<Link href="/books">Browse Books</Link>
+				<Link href="/posts">Recent Posts</Link>
+				<Link href="/books">Popular Books</Link>
 				<Link href="/search">Search Books</Link>
 				{user ? (
 					<DropdownMenu>
@@ -56,7 +56,12 @@ const NavBar = () => {
 						</DropdownMenuContent>
 					</DropdownMenu>
 				) : (
-					<Link href="/signin">Sign In</Link>
+					<Link
+						className="border border-black/80 rounded-md px-2 hover:shadow-sm"
+						href="/signin"
+					>
+						Sign In
+					</Link>
 				)}
 			</div>
 		</nav>

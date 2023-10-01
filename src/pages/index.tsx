@@ -1,22 +1,19 @@
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/router";
+import GuestDash from "~/components/guest-dash";
 
 import PageLayout from "~/components/layout";
-import { LoadSpinner } from "~/components/loading";
+import PageHeader from "~/components/ui/page-header";
+import UserFeed from "~/components/user-feed";
 
 const Home = () => {
-	const router = useRouter();
-	const { isSignedIn } = useUser();
-
-	if (isSignedIn) {
-		router.push("/feed");
-	} else {
-		router.push("/posts");
-	}
+	const { isSignedIn, user } = useUser();
 
 	return (
 		<PageLayout>
-			<LoadSpinner />
+			<div className="flex flex-col items-center">
+				<PageHeader title={`Welcome ${user?.username || "Guest"}!`} />
+				{isSignedIn ? <UserFeed /> : <GuestDash />}
+			</div>
 		</PageLayout>
 	);
 };

@@ -15,7 +15,7 @@ const AllBooksPage = () => {
 	return (
 		<PageLayout>
 			<div className="flex flex-col items-center p-4 max-w-2xl m-auto gap-6">
-				<PageHeader title="Recently reviewed books" />
+				<PageHeader title="Popular Books" />
 				{data?.map((book) => {
 					return (
 						<div key={book.bookData.id} className="w-full flex flex-col gap-1">
