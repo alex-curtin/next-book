@@ -67,9 +67,9 @@ const SingleUserPage = ({ id }: { id: string }) => {
 		id,
 	});
 
-	if (!user) return <NotFound message="User not found" />;
-
 	const { user: currentUser } = useUser();
+
+	if (!user) return <NotFound message="User not found" />;
 
 	return (
 		<PageLayout>
