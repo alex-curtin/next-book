@@ -12,6 +12,7 @@ import {
 } from "./ui/dropdown-menu";
 import ProfileIcon from "./ui/icons/profile-icon";
 import SignOutIcon from "./ui/icons/signout-icon";
+import { Button } from "./ui/button";
 
 const NavBar = () => {
 	const { user } = useUser();
@@ -56,12 +57,9 @@ const NavBar = () => {
 						</DropdownMenuContent>
 					</DropdownMenu>
 				) : (
-					<Link
-						className="border border-black/80 rounded-md px-2 hover:shadow-sm"
-						href="/signin"
-					>
-						Sign In
-					</Link>
+					<Button variant="outline">
+						<Link href="/signin">Sign In</Link>
+					</Button>
 				)}
 			</div>
 		</nav>

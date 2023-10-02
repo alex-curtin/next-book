@@ -40,7 +40,7 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 						</div>
 					))}
 				</div>
-				{isLoadingGoogleBooks && <LoadSpinner size={24} />}
+				{isLoadingGoogleBooks && <LoadSpinner size={36} />}
 				{googleBooks?.length && (
 					<div>
 						<h3 className="self-start font-semibold px-4">
