@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/router";
 
 import { type Book } from "~/server/api/routers/google-api";
 import { RouterOutputs } from "~/utils/api";
@@ -15,7 +14,6 @@ const BookItem = ({
 	book,
 	showFullDescription = false,
 }: { book: Book | BookWithAuthors; showFullDescription?: boolean }) => {
-	const router = useRouter();
 	const description = !showFullDescription
 		? truncateString(book.description || "")
 		: book.description;
@@ -28,7 +26,8 @@ const BookItem = ({
 						src={book.imageUrl || DEFAULT_IMG_URL}
 						alt={book.title}
 						width={128}
-						height={128}
+						height={0}
+						style={{ height: "auto" }}
 					/>
 				</div>
 			</Link>
@@ -43,7 +42,9 @@ const BookItem = ({
 							<p className="text-black/90">{author.name}</p>
 						</Link>
 					) : (
-						<p className="text-black/90">{author.name}</p>
+						<p className="text-black/90" key={author.name}>
+							{author.name}
+						</p>
 					),
 				)}
 				{book.description && <p className="text-sm">{description}</p>}
