@@ -26,7 +26,7 @@ const UserRecs = () => {
 					</div>
 				</>
 			)}
-			{error && <p>Can't get recommendations, please try again later.</p>}
+			{error && <h3>Error getting recommendations. Please try again later.</h3>}
 		</div>
 	);
 };
