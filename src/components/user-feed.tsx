@@ -7,7 +7,7 @@ const UserFeed = () => {
 	const { data: postsData, isLoading } = api.posts.getUserFeed.useQuery();
 
 	return (
-		<div className="flex flex-col p-4 max-w-2xl mx-auto">
+		<div className="flex flex-col max-w-2xl mx-auto">
 			{isLoading && <LoadSpinner />}
 			{!isLoading && postsData?.length ? (
 				<>
