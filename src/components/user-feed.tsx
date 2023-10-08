@@ -5,10 +5,24 @@ import { LoadSpinner } from "~/components/loading";
 
 const UserFeed = () => {
 	const { data: postsData, isLoading } = api.posts.getUserFeed.useQuery();
+	const { data: recommendations } =
+		api.googleApi.getUserRecommendations.useQuery(undefined, { retry: false });
 
 	return (
 		<div className="flex flex-col p-4 max-w-2xl mx-auto">
 			{isLoading && <LoadSpinner />}
+			{recommendations?.length && (
+				<>
+					<h3 className="font-semibold mb-2">Recommended for you</h3>
+					<div className="flex flex-col gap-4 mb-4">
+						{recommendations.map((book) => (
+							<div key={book.googleId}>
+								<BookItem book={book} />
+							</div>
+						))}
+					</div>
+				</>
+			)}
 			{!isLoading && postsData?.length ? (
 				<>
 					<h3 className="font-semibold mb-2">Your Feed</h3>
