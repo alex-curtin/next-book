@@ -89,7 +89,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 		isLoading: isLoadingRecs,
 	} = api.googleApi.getRecommendations.useQuery(
 		{
-			book: `${book.title} by ${book.authors[0]}`,
+			book: `${book.title} by ${book.authors[0].name}`,
 		},
 		{ retry: false },
 	);

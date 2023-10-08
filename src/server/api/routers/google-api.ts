@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import axios, { AxiosResponse } from "axios";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { OpenAI } from "openai";
 import { Redis } from "@upstash/redis";
 
@@ -182,6 +182,7 @@ export const googleApiRouter = createTRPCRouter({
 	getUserRecommendations: privateProcedure.query(async ({ ctx }) => {
 		const userPosts = await ctx.db.query.posts.findMany({
 			where: eq(posts.posterId, ctx.userId),
+			orderBy: [desc(posts.createdAt)],
 			with: {
 				book: {
 					with: {
