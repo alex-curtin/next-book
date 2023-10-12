@@ -36,17 +36,20 @@ const BookItem = ({
 					<p className="font-bold text-black/80">{book.title}</p>
 					<p>{book.subtitle}</p>
 				</Link>
-				{book.authors.map((author) =>
-					author.id ? (
-						<Link key={author.id} href={`/authors/${author.id}`}>
-							<p className="text-black/90">{author.name}</p>
-						</Link>
-					) : (
-						<p className="text-black/90" key={author.name}>
-							{author.name}
-						</p>
-					),
-				)}
+				{book.authors.map((author) => (
+					// author.id ? (
+					// 	<Link key={author.id} href={`/authors/${author.id}`}>
+					// 		<p className="text-black/90">{author.name}</p>
+					// 	</Link>
+					// ) : (
+					// 	<p className="text-black/90" key={author.name}>
+					// 		{author.name}
+					// 	</p>
+					// ),
+					<Link key={author.name} href={`/authors/${author.name}`}>
+						<p className="text-black/90">{author.name}</p>
+					</Link>
+				))}
 				{book.description && <p className="text-sm">{description}</p>}
 			</div>
 		</div>
