@@ -103,4 +103,88 @@ export const authorsRouter = createTRPCRouter({
 				books,
 			};
 		}),
+
+	getByName: publicProcedure
+		.input(
+			z.object({
+				name: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const author = await ctx.db.query.authors.findFirst({
+				where: eq(authors.name, input.name),
+				with: {
+					bookAuthors: {
+						with: {
+							book: {
+								with: {
+									posts: true,
+									bookAuthors: {
+										with: {
+											author: true,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			});
+
+			if (!author) {
+				return {
+					name: input.name,
+					id: null,
+					books: [],
+				};
+			}
+
+			const posterIds = author.bookAuthors.flatMap(({ book }) =>
+				book.posts.map((post) => post.posterId),
+			);
+			const users = await clerkClient.users.getUserList({
+				userId: posterIds,
+			});
+			const filteredUsers = users.map((user) => ({
+				id: user.id,
+				username: user.username,
+				imageUrl: user.imageUrl,
+			}));
+
+			const books = author.bookAuthors.map(({ book }) => {
+				const { bookAuthors, posts, ...bookData } = book;
+				return {
+					bookData: {
+						...bookData,
+						authors: bookAuthors.map((b) => b.author),
+					},
+					posts: posts.map((post) => {
+						const poster = filteredUsers.find(
+							(user) => user.id === post.posterId,
+						);
+						if (!poster || !poster.username) {
+							throw new TRPCError({
+								code: "INTERNAL_SERVER_ERROR",
+								message: "Poster not found",
+							});
+						}
+
+						return {
+							...post,
+							poster: {
+								id: poster.id,
+								username: poster.username,
+								imageUrl: poster.imageUrl,
+							},
+						};
+					}),
+				};
+			});
+
+			return {
+				name: author.name,
+				id: author.id,
+				books,
+			};
+		}),
 });

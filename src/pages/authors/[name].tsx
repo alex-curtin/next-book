@@ -6,32 +6,36 @@ import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 import PageLayout from "~/components/layout";
 import BookItem from "~/components/book-item";
 import RatingSummary from "~/components/rating-summary";
-import NotFound from "~/components/not-found";
 import { LoadSpinner, LoadingPage } from "~/components/loading";
 import PageHeader from "~/components/ui/page-header";
 
-const SingleAuthorPage = ({ id }: { id: string }) => {
-	const { data: author, isLoading } = api.authors.getAllPostsBy.useQuery({
-		id,
+const SingleAuthorPage = ({ name }: { name: string }) => {
+	const { data: author, isLoading } = api.authors.getByName.useQuery({
+		name,
 	});
 
-	if (isLoading) return <LoadingPage />;
-	if (!author) return <NotFound message="Author not found" />;
+	let titles: string[] = [];
+	if (author) {
+		titles = author.books.map((book) => book.bookData.title);
+	}
 
-	const titles = author.books.map((book) => book.bookData.title);
 	const { data: googleBooks, isLoading: isLoadingGoogleBooks } =
 		api.googleApi.getBooksByAuthor.useQuery({
-			author: author.name,
+			author: name,
 			titles,
 		});
+
+	if (isLoading) return <LoadingPage />;
 
 	return (
 		<PageLayout>
 			<div className="flex flex-col items-center p-4 max-w-2xl m-auto">
-				<PageHeader title={`Books by ${author.name}`} />
+				<PageHeader title={`Books by ${name}`} />
 				<div className="mb-8 min-w-[640px]">
-					<h3 className="self-start font-semibold px-4">User Reviewed:</h3>
-					{author.books.map(({ bookData, posts }) => (
+					<h3 className="self-start font-semibold px-4">
+						{author?.books.length ? "User Reviewed:" : "No reviews yet"}
+					</h3>
+					{author?.books.map(({ bookData, posts }) => (
 						<div key={bookData.id} className="flex flex-col p-4 w-full">
 							<BookItem book={bookData} />
 							<Link href={`/books/${bookData.googleId}`}>
@@ -44,7 +48,7 @@ const SingleAuthorPage = ({ id }: { id: string }) => {
 				{googleBooks?.length && (
 					<div>
 						<h3 className="self-start font-semibold px-4">
-							Other books by {author.name}:
+							{author?.books.length ? `Other books by ${name}:` : ""}
 						</h3>
 						<div className="flex flex-col gap-2 p-4">
 							{googleBooks?.map((book) => (
@@ -64,17 +68,17 @@ export default SingleAuthorPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const ssHelper = generateSSHelper();
-	const id = context?.params?.id;
+	const name = context?.params?.name;
 
-	if (typeof id !== "string") {
-		throw new Error("Missing id");
+	if (typeof name !== "string") {
+		throw new Error("Missing name");
 	}
 
-	await ssHelper.authors.getAllPostsBy.prefetch({ id });
+	await ssHelper.authors.getByName.prefetch({ name });
 
 	return {
 		props: {
-			id,
+			name,
 			trpcState: ssHelper.dehydrate(),
 		},
 	};
