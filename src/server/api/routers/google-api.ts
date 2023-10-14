@@ -53,7 +53,7 @@ const transformBooks = (books: GoogleBooksResult[]): Book[] => {
 	});
 };
 
-const getOpenAIRecommendations = async (prompt: string, maxTokens = 256) => {
+const getOpenAIRecommendations = async (prompt: string, maxTokens = 1024) => {
 	const openai = new OpenAI({
 		apiKey: process.env.OPENAI_API_KEY,
 	});
