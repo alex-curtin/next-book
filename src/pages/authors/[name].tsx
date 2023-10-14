@@ -46,7 +46,7 @@ const SingleAuthorPage = ({ name }: { name: string }) => {
 				</div>
 				{isLoadingGoogleBooks && <LoadSpinner size={36} />}
 				{googleBooks?.length && (
-					<div>
+					<div className="w-full">
 						<h3 className="self-start font-semibold px-4">
 							{author?.books.length ? `Other books by ${name}:` : ""}
 						</h3>

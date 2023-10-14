@@ -9,11 +9,11 @@ const RatingSummary = ({ posts }: { posts: Posts }) => {
 		posts.reduce((acc, cur) => acc + cur.rating, 0) / reviewCount,
 	);
 	return (
-		<div className="flex gap-1 text-sm items-center">
+		<div className="text-sm">
+			<p className="mr-1">Average rating:</p>
 			<div className="flex items-center">
-				<span className="mr-1">Average rating:</span>
 				{Array.from({ length: 5 }).map((_, i) => (
-					// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 					<StarIcon key={i} filled={i < avgRating} />
 				))}
 			</div>

@@ -21,36 +21,28 @@ const BookItem = ({
 	return (
 		<div className="flex gap-2">
 			<Link href={`/books/${book.googleId}`}>
-				<div className="w-[128px] h-auto">
+				<div className="h-auto w-[125px]">
 					<Image
 						src={book.imageUrl || DEFAULT_IMG_URL}
 						alt={book.title}
-						width={128}
+						width={125}
 						height={0}
 						style={{ height: "auto" }}
 					/>
 				</div>
 			</Link>
-			<div className="flex flex-col">
+			<div className="flex flex-col min-w-[125px]">
 				<Link href={`/books/${book.googleId}`}>
-					<p className="font-bold text-black/80">{book.title}</p>
-					<p>{book.subtitle}</p>
+					<p className="font-bold text-black/80 text-lg leading-5">
+						{book.title}
+					</p>
+					<p className="text-black/80">{book.subtitle}</p>
 				</Link>
 				{book.authors.map((author) => (
-					// author.id ? (
-					// 	<Link key={author.id} href={`/authors/${author.id}`}>
-					// 		<p className="text-black/90">{author.name}</p>
-					// 	</Link>
-					// ) : (
-					// 	<p className="text-black/90" key={author.name}>
-					// 		{author.name}
-					// 	</p>
-					// ),
 					<Link key={author.name} href={`/authors/${author.name}`}>
-						<p className="text-black/90">{author.name}</p>
+						<p className="text-black/90 text-sm">{author.name}</p>
 					</Link>
 				))}
-				{book.description && <p className="text-sm">{description}</p>}
 			</div>
 		</div>
 	);

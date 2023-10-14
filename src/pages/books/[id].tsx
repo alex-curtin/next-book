@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
+import Image from "next/image";
 
 import { DEFAULT_IMG_URL } from "~/constants";
 import { Textarea } from "~/components/ui/textarea";
@@ -17,6 +18,8 @@ import NotFound from "~/components/not-found";
 import BookItem from "~/components/book-item";
 import PostItem from "~/components/post-item";
 import { LoadSpinner } from "~/components/loading";
+import RatingSummary from "~/components/rating-summary";
+import HorizontalScroller from "~/components/ui/horizontal-scroller";
 
 const AddPost = ({ book }: { book: Book }) => {
 	const router = useRouter();
@@ -52,7 +55,7 @@ const AddPost = ({ book }: { book: Book }) => {
 		<div className="flex flex-col gap-1">
 			<div className="flex">
 				{Array.from({ length: 5 }).map((_, i) => (
-					// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 					<button type="button" onClick={() => setRating(i + 1)} key={i}>
 						<StarIcon filled={i < rating} />
 					</button>
@@ -74,7 +77,7 @@ const AddPost = ({ book }: { book: Book }) => {
 };
 
 const SingleBookPage = ({ id }: { id: string }) => {
-	const { isSignedIn } = useUser();
+	const { isSignedIn, user } = useUser();
 	const { data: book } = api.googleApi.getBookById.useQuery({ id });
 
 	if (!book) return <NotFound message="Book not found" />;
@@ -82,6 +85,11 @@ const SingleBookPage = ({ id }: { id: string }) => {
 	const { data: posts } = api.books.getBookPostsByGoogleId.useQuery({
 		googleId: book.googleId,
 	});
+
+	const userHasReviewed =
+		user && posts
+			? posts?.map((post) => post.poster.id).includes(user?.id)
+			: false;
 
 	const {
 		data: recs,
@@ -96,39 +104,82 @@ const SingleBookPage = ({ id }: { id: string }) => {
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col items-center p-4 max-w-2xl m-auto">
-				<div className="flex flex-col p-4 gap-4">
-					<BookItem book={book} showFullDescription={true} />
-					{isSignedIn ? (
+			<div className="flex flex-col items-center py-4 px-24">
+				<div className="flex flex-col p-4 gap-4 w-full">
+					<div className="flex gap-2">
+						<div className="h-auto">
+							<Image
+								src={book.imageUrl || DEFAULT_IMG_URL}
+								alt={book.title}
+								width={150}
+								height={0}
+								style={{ height: "auto" }}
+							/>
+						</div>
+						<div className="flex flex-col">
+							<Link href={`/books/${book.googleId}`}>
+								<h2 className="text-black/80 text-3xl">{book.title}</h2>
+								<p className="text-black/80 text-xl">{book.subtitle}</p>
+							</Link>
+							{book.authors.map((author) => (
+								<Link key={author.name} href={`/authors/${author.name}`}>
+									<p className="text-slate-700 font-bold">{author.name}</p>
+								</Link>
+							))}
+							<div className="mt-auto">
+								<RatingSummary
+									posts={
+										posts?.map((post) => {
+											const { poster, ...rest } = post;
+											return rest;
+										}) || []
+									}
+								/>
+							</div>
+						</div>
+					</div>
+					<hr />
+					<div>
+						<p className="text-sm">{book.description}</p>
+					</div>
+					<hr />
+					{isSignedIn && !userHasReviewed ? (
 						<AddPost book={book} />
 					) : (
+						!isSignedIn && (
+							<div>
+								<Link href="/signin">Sign in</Link> to create a post
+							</div>
+						)
+					)}
+					<hr />
+					{isLoadingRecs && <LoadSpinner size={24} />}
+					{recs && (
 						<div>
-							<Link href="/signin">Sign in</Link> to create a post
+							<h2 className="font-semibold">You might also like</h2>
+							<HorizontalScroller>
+								{recs.map((book) => (
+									<BookItem book={book} key={book.googleId} />
+								))}
+							</HorizontalScroller>
 						</div>
 					)}
-					<div>
+					{recsError && (
+						<h2>Error getting recommendations. Please try again later.</h2>
+					)}
+					<hr />
+					{posts?.length ? (
+						<h2 className="font-semibold">User Reviews</h2>
+					) : (
+						<h2 className="font-semibold">No Reviews Yet</h2>
+					)}
+					<div className="w-1/2">
 						{posts
 							?.sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
 							.map((post) => (
 								<PostItem key={post.id} post={post} />
 							))}
 					</div>
-					{isLoadingRecs && <LoadSpinner size={24} />}
-					{recs && (
-						<div>
-							<h2 className="font-semibold mb-4">
-								Recommended for fans of this book:
-							</h2>
-							<div className="flex flex-col gap-4">
-								{recs?.map((book) => (
-									<BookItem book={book} key={book.googleId} />
-								))}
-							</div>
-						</div>
-					)}
-					{recsError && (
-						<h2>Error getting recommendations. Please try again later.</h2>
-					)}
 				</div>
 			</div>
 		</PageLayout>
