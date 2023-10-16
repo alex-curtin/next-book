@@ -25,7 +25,7 @@ const AddPost = ({ book }: { book: Book }) => {
 	const router = useRouter();
 	const [postContent, setPostContent] = useState("");
 	const [rating, setRating] = useState(3);
-	const { mutate } = api.posts.createPost.useMutation({
+	const { mutate, isLoading } = api.posts.createPost.useMutation({
 		onSuccess: (post) => {
 			toast("Post created!");
 			router.push(`/posts/${post.id}`);
@@ -69,8 +69,8 @@ const AddPost = ({ book }: { book: Book }) => {
 				placeholder="Write a post about this book"
 				onChange={(e) => setPostContent(e.target.value)}
 			/>
-			<Button onClick={onClickCreate} disabled={!postContent.length}>
-				Post
+			<Button onClick={onClickCreate} disabled={!postContent.length || isLoading}>
+				{isLoading ? <LoadSpinner /> : 'Post' }
 			</Button>
 		</div>
 	);
@@ -142,9 +142,11 @@ const SingleBookPage = ({ id }: { id: string }) => {
 					<div>
 						<p className="text-sm">{book.description}</p>
 					</div>
-					<hr />
-					{isSignedIn && !userHasReviewed ? (
-						<AddPost book={book} />
+          {isSignedIn && !userHasReviewed ? (
+            <>
+					    <hr />
+						  <AddPost book={book} />
+            </>
 					) : (
 						!isSignedIn && (
 							<div>

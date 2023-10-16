@@ -64,7 +64,7 @@ const EditPost = ({
 		<div className="flex flex-col gap-2 w-full relative">
 			<div className="flex">
 				{Array.from({ length: 5 }).map((_, i) => (
-					// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 					<button type="button" onClick={() => setRating(i + 1)} key={i}>
 						<StarIcon filled={i < rating} />
 					</button>
@@ -120,6 +120,9 @@ const SinglePostPage = ({ id }: { id: string }) => {
 	const { data: postData } = api.posts.getById.useQuery({ id });
 
 	if (!postData) return <NotFound message="Post not found" />;
+	const { mutate } = api.books.assignCategories.useMutation({
+		onSuccess: () => console.log("success"),
+	});
 
 	return (
 		<PageLayout>
@@ -144,6 +147,17 @@ const SinglePostPage = ({ id }: { id: string }) => {
 									</button>
 								)}
 								<PostItem key={postData.post.id} post={postData.post} />
+								<button
+									type="button"
+									onClick={() =>
+										mutate({
+											title: `${postData.book.title} by ${postData.book.authors[0].name}`,
+											id: postData.book.id,
+										})
+									}
+								>
+									assign categories
+								</button>
 							</div>
 						)}
 					</div>

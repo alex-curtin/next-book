@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { eq, desc, inArray } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs";
+import { OpenAI } from "openai";
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "../trpc";
 import {
@@ -10,6 +11,9 @@ import {
 	bookAuthors,
 	posts,
 	follows,
+	bookCategories,
+	type Category,
+	categories,
 } from "~/server/db/schema";
 
 type PostWithBooksAndAuthors = {
@@ -75,6 +79,37 @@ const formatPosts = async (posts: PostWithBooksAndAuthors[]) => {
 	});
 };
 
+const getCateogriesPrompt = (book: string) => `
+  What genre or genres is the book ${book}? Please format in a JSON array of strings.
+`;
+
+const getBookCategories = async (prompt: string) => {
+	const openai = new OpenAI({
+		apiKey: process.env.OPENAI_API_KEY,
+	});
+
+	const response = await openai.chat.completions.create({
+		model: "gpt-3.5-turbo",
+		messages: [
+			{
+				role: "user",
+				content: prompt,
+			},
+		],
+		temperature: 1,
+	});
+	console.log("openai response: ", response);
+	const catString = response.choices[0].message.content;
+
+	if (!catString) {
+		return [];
+	}
+
+	const catArray: string[] = JSON.parse(catString);
+
+	return catArray;
+};
+
 export const postsRouter = createTRPCRouter({
 	createPost: privateProcedure
 		.input(
@@ -109,6 +144,8 @@ export const postsRouter = createTRPCRouter({
 						description: input.book.description || "",
 					})
 					.returning();
+
+				const authorsArray: string[] = [];
 				input.authors.forEach(async (author) => {
 					let [newAuthor] = await ctx.db
 						.select()
@@ -122,9 +159,33 @@ export const postsRouter = createTRPCRouter({
 							})
 							.returning();
 					}
+					authorsArray.push(newAuthor.name);
 					await ctx.db.insert(bookAuthors).values({
 						authorId: newAuthor.id,
 						bookId: book.id,
+					});
+				});
+
+				// add categories
+				const bookString = `${book.title} by ${authorsArray[0]}`;
+				const prompt = getCateogriesPrompt(bookString);
+				const bookCats = await getBookCategories(prompt);
+				bookCats.forEach(async (cat) => {
+					let category = await ctx.db.query.categories.findFirst({
+						where: eq(categories.name, cat.toLowerCase()),
+					});
+					if (!category) {
+						[category] = await ctx.db
+							.insert(categories)
+							.values({
+								name: cat.toLowerCase(),
+							})
+							.returning();
+					}
+
+					await ctx.db.insert(bookCategories).values({
+						bookId: book.id,
+						categoryId: category.id,
 					});
 				});
 			}

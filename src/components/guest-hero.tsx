@@ -1,11 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { Button } from "./ui/button";
 
 const GuestHero = () => {
 	return (
-		<div className="bg-green-300 w-full lg:bg-[url('/hero-image.jpeg')] bg-contain ">
+		<div className="bg-green-300 w-full lg:bg-[url('/hero-image.jpeg')] bg-contain">
 			<div className="w-full p-32 flex flex-col gap-12 bg-gradient-to-r from-green-300 via-green-300 to-green-200/0">
 				<div>
 					<p className="text-3xl">Welcome bibliophile!</p>
