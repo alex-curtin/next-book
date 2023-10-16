@@ -8,6 +8,8 @@ import BookItem from "~/components/book-item";
 import RatingSummary from "~/components/rating-summary";
 import { LoadSpinner, LoadingPage } from "~/components/loading";
 import PageHeader from "~/components/ui/page-header";
+import { Button } from "~/components/ui/button";
+import LoadMore from "~/components/ui/load-more";
 
 const SingleAuthorPage = ({ name }: { name: string }) => {
 	const { data: author, isLoading } = api.authors.getByName.useQuery({
@@ -15,47 +17,69 @@ const SingleAuthorPage = ({ name }: { name: string }) => {
 	});
 
 	let titles: string[] = [];
+
 	if (author) {
 		titles = author.books.map((book) => book.bookData.title);
 	}
 
-	const { data: googleBooks, isLoading: isLoadingGoogleBooks } =
-		api.googleApi.getBooksByAuthor.useQuery({
+	const {
+		data: googleBooks,
+		fetchNextPage,
+		isLoading: isLoadingGoogleBooks,
+	} = api.googleApi.getBooksByAuthor.useInfiniteQuery(
+		{
 			author: name,
 			titles,
-		});
+		},
+		{
+			getNextPageParam: (lastPage) => lastPage.nextCursor,
+		},
+	);
 
 	if (isLoading) return <LoadingPage />;
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col items-center p-4 max-w-2xl m-auto">
-				<PageHeader title={`Books by ${name}`} />
+			<div className="flex flex-col p-8">
+				<div className="text-center">
+					<PageHeader title={name} />
+				</div>
 				<div className="mb-8 min-w-[640px]">
-					<h3 className="self-start font-semibold px-4">
-						{author?.books.length ? "User Reviewed:" : "No reviews yet"}
-					</h3>
-					{author?.books.map(({ bookData, posts }) => (
-						<div key={bookData.id} className="flex flex-col p-4 w-full">
-							<BookItem book={bookData} />
-							<Link href={`/books/${bookData.googleId}`}>
-								<RatingSummary posts={posts} />
-							</Link>
-						</div>
-					))}
+					<h2 className="self-start font-semibold px-4">
+						{author?.books.length ? "User Reviewed" : "No reviews yet"}
+					</h2>
+					<div className="flex">
+						{author?.books.map(({ bookData, posts }) => (
+							<div key={bookData.id} className="flex flex-col p-4 w-72">
+								<BookItem book={bookData} />
+								<Link href={`/books/${bookData.googleId}`}>
+									<RatingSummary posts={posts} />
+								</Link>
+							</div>
+						))}
+					</div>
 				</div>
 				{isLoadingGoogleBooks && <LoadSpinner size={36} />}
-				{googleBooks?.length && (
+				{googleBooks?.pages.length && (
 					<div className="w-full">
-						<h3 className="self-start font-semibold px-4">
-							{author?.books.length ? `Other books by ${name}:` : ""}
-						</h3>
-						<div className="flex flex-col gap-2 p-4">
-							{googleBooks?.map((book) => (
-								<div key={book.googleId}>
-									<BookItem book={book} />
-								</div>
-							))}
+						<h2 className="self-start font-semibold px-4">
+							{author?.books.length ? `More by ${name}` : `Books by ${name}`}
+						</h2>
+						<div className="flex flex-wrap gap-2">
+							{googleBooks?.pages.map((page) =>
+								page.books.map((book) => (
+									<div key={book.googleId} className="w-72 p-4">
+										<BookItem book={book} />
+									</div>
+								)),
+							)}
+						</div>
+						<div className="flex justify-center">
+							<LoadMore action={fetchNextPage}>
+								<Button variant="link" onClick={() => fetchNextPage()}>
+									load more
+								</Button>
+							</LoadMore>
 						</div>
 					</div>
 				)}
