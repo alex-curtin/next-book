@@ -39,6 +39,26 @@ export const bookAuthors = pgTable(
 	}),
 );
 
+export const categories = pgTable("categories", {
+	id: serial("id").primaryKey().notNull(),
+	name: varchar("name").notNull(),
+});
+
+export const bookCategories = pgTable(
+	"book_categories",
+	{
+		bookId: integer("book_id")
+			.notNull()
+			.references(() => books.id),
+		categoryId: integer("category_id")
+			.notNull()
+			.references(() => categories.id),
+	},
+	(t) => ({
+		pk: primaryKey(t.bookId, t.categoryId),
+	}),
+);
+
 export const posts = pgTable("posts", {
 	id: serial("id").primaryKey().notNull(),
 	bookId: integer("book_id")
@@ -77,6 +97,11 @@ export const follows = pgTable(
 export const bookRelations = relations(books, ({ many }) => ({
 	bookAuthors: many(bookAuthors),
 	posts: many(posts),
+	bookCategories: many(bookCategories),
+}));
+
+export const categoryRelations = relations(categories, ({ many }) => ({
+	bookCategories: many(bookCategories),
 }));
 
 export const authorRelations = relations(authors, ({ many }) => ({
@@ -91,6 +116,17 @@ export const bookAuthorsRelations = relations(bookAuthors, ({ one }) => ({
 	author: one(authors, {
 		fields: [bookAuthors.authorId],
 		references: [authors.id],
+	}),
+}));
+
+export const bookCategoriesRelations = relations(bookCategories, ({ one }) => ({
+	book: one(books, {
+		fields: [bookCategories.bookId],
+		references: [books.id],
+	}),
+	category: one(categories, {
+		fields: [bookCategories.categoryId],
+		references: [categories.id],
 	}),
 }));
 
@@ -109,6 +145,7 @@ export const commentRelations = relations(comments, ({ one }) => ({
 	}),
 }));
 
+export type Category = InferModel<typeof categories>;
 export type Book = InferModel<typeof books>;
 export type Post = InferModel<typeof posts>;
 export type Author = InferModel<typeof authors>;
