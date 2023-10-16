@@ -1,9 +1,9 @@
 import { api } from "~/utils/api";
+import { LoadSpinner } from "~/components/loading";
 import PostFeedItem from "./post-feed-item";
-import { LoadSpinner } from "./loading";
 
-const UserFeed = () => {
-	const { data: postsData, isLoading } = api.posts.getUserFeed.useQuery();
+const GuestFeed = () => {
+	const { data: postsData, isLoading } = api.posts.getAll.useQuery();
 
 	return (
 		<div className="flex flex-col mx-auto">
@@ -23,4 +23,4 @@ const UserFeed = () => {
 	);
 };
 
-export default UserFeed;
+export default GuestFeed;
