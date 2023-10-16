@@ -13,6 +13,11 @@ const redis = Redis.fromEnv();
 
 const BASE_URL = "https://www.googleapis.com/books/v1/volumes";
 
+const second = 1000;
+const minute = 60 * second;
+const hour = 60 * minute;
+const day = 24 * hour;
+
 const cleanHTMLString = (str: string) => str.replace(/<\/?[^>]+(>|$)/g, "");
 
 type GoogleBooksResult = {
@@ -35,6 +40,11 @@ export type Book = {
 	subtitle: string;
 	googleId: string;
 	description: string;
+};
+
+type UserRecommendationsCache = {
+	userBooks: string;
+	recommendations: Book[];
 };
 
 const transformBooks = (books: GoogleBooksResult[]): Book[] => {
@@ -208,15 +218,25 @@ export const googleApiRouter = createTRPCRouter({
 			})
 			.join("; ");
 
-		const cache: Book[] | null = await redis.get(userBooks);
+		const cache: UserRecommendationsCache | null = await redis.get(ctx.userId);
+
 		if (cache) {
-			return cache;
+			if (cache.userBooks === userBooks) {
+				return cache.recommendations;
+			}
 		}
 
-		const prompt = `Please recommend 5 books for someone who read the following books: ${userBooks}. Format as a JSON array of strings, ie "[title - author]".`;
+		const prompt = `Please recommend 5 books for someone who read the following books: ${userBooks}. Be sure not to repeat any books from that list. Format as a JSON array of strings, ie "[title - author]".`;
 		const bookRecs = await getOpenAIRecommendations(prompt, 512);
 
-		await redis.set(userBooks, JSON.stringify(bookRecs));
+		await redis.set(
+			ctx.userId,
+			JSON.stringify({
+				userBooks,
+				recommendations: bookRecs,
+			}),
+			{ px: day },
+		);
 
 		return bookRecs;
 	}),

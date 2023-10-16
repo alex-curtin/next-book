@@ -12,7 +12,6 @@ import {
 	posts,
 	follows,
 	bookCategories,
-	type Category,
 	categories,
 } from "~/server/db/schema";
 

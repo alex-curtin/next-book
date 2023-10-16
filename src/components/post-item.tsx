@@ -43,40 +43,12 @@ const PostItem = ({ post }: { post: PostWithPoster }) => {
 				</div>
 				<div className="flex">
 					{Array.from({ length: 5 }).map((_, i) => (
-						// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-						<StarIcon filled={i < post.rating} key={i} />
+						<StarIcon filled={i < post.rating} key={`star-${i}`} />
 					))}
 				</div>
 
-				<div
-					className={`${
-						isExpanded ? "" : "max-h-[136px]"
-					} bg-neutral-200 w-full min-w-[500px] px-4 py-2 min-h-[96px] rounded-sm overflow-hidden relative`}
-				>
-					<Link href={`/posts/${post.id}`}>
-						<p className="text-ellipsis text-sm">{post.content}</p>
-					</Link>
-					{!isExpanded ? (
-						<div className="absolute bottom-0 right-0 w-full text-end bg-gradient-to-t from-neutral-200 via-50% via-neutral-200 to-transparent">
-							<button
-								type="button"
-								className="text-black/80 w-full px-4 pt-4 py-1 h-12 flex items-end justify-end"
-								onClick={() => setIsExpanded(true)}
-							>
-								see more
-							</button>
-						</div>
-					) : (
-						<div className="w-full text-end">
-							<button
-								type="button"
-								className="text-black/80 w-full px-4 py-1 flex items-end justify-end"
-								onClick={() => setIsExpanded(false)}
-							>
-								see less
-							</button>
-						</div>
-					)}
+				<div className="w-full py-2 min-h-[96px]">
+					<p className="text-ellipsis text-sm">{post.content}</p>
 				</div>
 			</div>
 		</div>

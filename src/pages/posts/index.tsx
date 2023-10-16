@@ -9,10 +9,7 @@ import PageHeader from "~/components/ui/page-header";
 
 const AllPostsPage = () => {
 	const { data: postsData, isLoading } = api.posts.getAll.useQuery();
-	// const { data: categories } = api.books.test.useQuery();
-	// console.log("gpt categories response: ", categories);
-	const { data: categories } = api.categories.getWithBooks.useQuery();
-	console.log("categories with books", categories);
+
 	return (
 		<PageLayout>
 			<div className="flex flex-col items-center p-4 max-w-2xl mx-auto">
