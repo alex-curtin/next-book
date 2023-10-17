@@ -38,18 +38,18 @@ const PostFeedItem = ({ book, post }: { book: Book; post: Post }) => {
 					</Avatar>
 					<Link
 						href={`/users/${post.posterId}`}
-						className="font-semibold text-slate-800"
+						className="font-semibold text-black/90"
 					>
 						@{post.poster?.username}
 					</Link>{" "}
 				</div>
 				<Link href={`/books/${book.googleId}`}>
-					<p className="font-bold text-xl">{book.title}</p>
+					<p className="font-bold text-black/80 text-xl">{book.title}</p>
 				</Link>
-				<p className="text-sm">{book.subtitle}</p>
+				<p className="text-black/80">{book.subtitle}</p>
 				{book.authors.map((author) => (
 					<Link key={author.id} href={`/authors/${author.name}`}>
-						<p className="text-black/80 font-semibold">{author.name}</p>
+						<p className="text-slate-800 font-semibold">{author.name}</p>
 					</Link>
 				))}
 				<div className="flex items-center mt-2">

@@ -42,7 +42,11 @@ const SearchPage = () => {
 							<LoadSpinner size={24} />
 						</div>
 					) : (
-						<button type="button" onClick={() => fetchNextPage()}>
+						<button
+							type="button"
+							className="text-slate-600 font-bold text-sm"
+							onClick={() => fetchNextPage()}
+						>
 							load more
 						</button>
 					))}

@@ -19,7 +19,7 @@ const CategorySection = ({ category }: { category: Category }) => {
 	return (
 		<section className="w-full">
 			<div className="flex justify-between items-center px-8 mb-2">
-				<h2 className="text-lg font-bold uppercase">{category.name}</h2>
+				<h2 className="text-lg font-bold capitalize">{category.name}</h2>
 				<Link
 					href={`/categories/${category.id}`}
 					className="text-sm text-blue-800"
@@ -63,7 +63,7 @@ const RecommendationsSection = () => {
 	return (
 		<section className="w-full">
 			<div className="flex justify-between items-center px-8 mb-2">
-				<h2 className="text-lg font-bold uppercase">Recommended for you</h2>
+				<h2 className="text-lg font-bold capitalize">Recommended for you</h2>
 			</div>
 			<HorizontalScroller>
 				{(isLoading || isFetching) && (

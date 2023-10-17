@@ -66,7 +66,7 @@ const SearchBar = () => {
 				</Button>
 			</form>
 			{data?.length && (
-				<div className="absolute top-12 left-0 bg-white shadow-lg rounded-sm hidden group-focus-within:block">
+				<div className="absolute top-12 left-0 bg-white shadow-lg rounded-sm hidden group-focus-within:block w-full">
 					{data.map((book) => (
 						<Link
 							key={book.googleId}

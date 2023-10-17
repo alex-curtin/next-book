@@ -66,11 +66,14 @@ const AddPost = ({ book }: { book: Book }) => {
 				cols={60}
 				rows={10}
 				value={postContent}
-				placeholder="Write a post about this book"
+				placeholder="Review this book"
 				onChange={(e) => setPostContent(e.target.value)}
 			/>
-			<Button onClick={onClickCreate} disabled={!postContent.length || isLoading}>
-				{isLoading ? <LoadSpinner /> : 'Post' }
+			<Button
+				onClick={onClickCreate}
+				disabled={!postContent.length || isLoading}
+			>
+				{isLoading ? <LoadSpinner /> : "Post"}
 			</Button>
 		</div>
 	);
@@ -142,11 +145,11 @@ const SingleBookPage = ({ id }: { id: string }) => {
 					<div>
 						<p className="text-sm">{book.description}</p>
 					</div>
-          {isSignedIn && !userHasReviewed ? (
-            <>
-					    <hr />
-						  <AddPost book={book} />
-            </>
+					{isSignedIn && !userHasReviewed ? (
+						<>
+							<hr />
+							<AddPost book={book} />
+						</>
 					) : (
 						!isSignedIn && (
 							<div>

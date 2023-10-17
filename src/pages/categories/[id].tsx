@@ -7,6 +7,7 @@ import { LoadingPage } from "~/components/loading";
 import NotFound from "~/components/not-found";
 import BookItem from "~/components/book-item";
 import RatingSummary from "~/components/rating-summary";
+import PageHeader from "~/components/ui/page-header";
 
 const CategoryPage = ({ id }: { id: string }) => {
 	const { data: category, isLoading } = api.categories.getById.useQuery({ id });
@@ -22,9 +23,9 @@ const CategoryPage = ({ id }: { id: string }) => {
 	return (
 		<PageLayout>
 			<div className="p-8">
-				<h2 className="text-lg font-bold uppercase mb-8">
-					{category.name} Books
-				</h2>
+				<div className="pb-6">
+					<PageHeader title={category.name} />
+				</div>
 				<div className="flex flex-wrap gap-6">
 					{category.books.map((book) => (
 						<div key={book.id} className="w-[300px]">

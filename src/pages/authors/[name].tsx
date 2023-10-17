@@ -41,7 +41,7 @@ const SingleAuthorPage = ({ name }: { name: string }) => {
 	return (
 		<PageLayout>
 			<div className="flex flex-col p-8">
-				<div className="text-center">
+				<div className="pl-4 pb-4">
 					<PageHeader title={name} />
 				</div>
 				<div className="mb-8 min-w-[640px]">

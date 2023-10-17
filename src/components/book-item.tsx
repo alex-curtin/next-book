@@ -36,11 +36,13 @@ const BookItem = ({
 					<p className="font-bold text-black/80 text-lg leading-5">
 						{book.title}
 					</p>
-					<p className="text-black/80">{book.subtitle}</p>
+					<p className="text-black/80 text-sm">{book.subtitle}</p>
 				</Link>
 				{book.authors.map((author) => (
 					<Link key={author.name} href={`/authors/${author.name}`}>
-						<p className="text-black/90 text-sm">{author.name}</p>
+						<p className="text-slate-800 font-semibold text-sm">
+							{author.name}
+						</p>
 					</Link>
 				))}
 			</div>
