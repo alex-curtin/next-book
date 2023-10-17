@@ -20,7 +20,7 @@ const App = ({ Component, pageProps }: AppProps & { Component: Page }) => {
 			<Head>
 				<title>NextBook</title>
 			</Head>
-			<NavBar />
+			{/* <NavBar /> */}
 			<Toaster position="bottom-center" />
 			{getLayout(<Component {...pageProps} />)}
 		</ClerkProvider>

@@ -11,6 +11,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import UserFeed from "~/components/user-feed";
 import GuestFeed from "~/components/guest-feed";
+import { LoadingPage } from "~/components/loading";
 
 type Category = RouterOutputs["categories"]["getPrimary"][number];
 
@@ -92,8 +93,12 @@ const RecommendationsSection = () => {
 };
 
 const Home = () => {
-	const { isSignedIn, user } = useUser();
+	const { isSignedIn, user, isLoaded } = useUser();
 	const { data, isLoading } = api.categories.getPrimary.useQuery();
+
+	if (!isLoaded) {
+		return <LoadingPage />;
+	}
 
 	return (
 		<PageLayout banner={isSignedIn ? null : <GuestHero />}>

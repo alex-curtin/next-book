@@ -134,6 +134,18 @@ export const googleApiRouter = createTRPCRouter({
 			};
 		}),
 
+	previewSearch: publicProcedure
+		.input(z.object({ term: z.string() }))
+		.query(async ({ input }) => {
+			if (!input.term) return;
+			const { data }: { data: { items: GoogleBooksResult[] } } =
+				await axios.get(
+					`${BASE_URL}?q=${input.term}&maxResults=10&key=${process.env.GOOGLE_API_KEY}`,
+				);
+
+			return transformBooks(data.items);
+		}),
+
 	getBookById: publicProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input }) => {

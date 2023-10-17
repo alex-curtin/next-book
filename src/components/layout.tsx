@@ -1,4 +1,5 @@
 import { PropsWithChildren, ReactNode } from "react";
+import NavBar from "./navbar";
 
 const PageLayout = ({
 	children,
@@ -6,8 +7,9 @@ const PageLayout = ({
 }: { children: ReactNode; banner?: ReactNode }) => {
 	return (
 		<div className="h-screen">
+			<NavBar />
 			{banner}
-			<main className="flex flex-col items-center py-14 w-full 2xl:max-w-[1536px] 2xl:mx-auto">
+			<main className="flex flex-col items-center py-20 w-full 2xl:max-w-[1536px] 2xl:mx-auto">
 				<div className="w-full">{children}</div>
 			</main>
 		</div>
