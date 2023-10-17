@@ -47,10 +47,12 @@ const NavBar = () => {
 					<DropdownMenuContent>
 						<DropdownMenuItem>
 							{user ? (
-								<Link href="/profile" className="flex gap-1 items-center">
-									<UserCircle />
-									<span>Profile</span>
-								</Link>
+								user.username !== "guest" ? (
+									<Link href="/profile" className="flex gap-1 items-center">
+										<UserCircle />
+										<span>Profile</span>
+									</Link>
+								) : null
 							) : (
 								<Link href="/signup" className="flex gap-1 items-center">
 									<UserPlus />

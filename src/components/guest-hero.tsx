@@ -1,8 +1,31 @@
 import Link from "next/link";
+import { useSignIn } from "@clerk/nextjs";
 
 import { Button } from "./ui/button";
+import toast from "react-hot-toast";
 
 const GuestHero = () => {
+	const { isLoaded, signIn, setActive } = useSignIn();
+
+	const guestSignIn = async () => {
+		if (!isLoaded) return;
+
+		try {
+			const { status, createdSessionId } = await signIn.create({
+				identifier: "guest",
+				password: process.env.NEXT_PUBLIC_GUEST_USER_PASSWORD,
+			});
+
+			if (status === "complete") {
+				setActive({ session: createdSessionId });
+			} else {
+				toast("Error logging in as guest");
+			}
+		} catch (error) {
+			toast("Error logging in as guest");
+		}
+	};
+
 	return (
 		<div className="bg-green-300 w-full lg:bg-[url('/hero-image.jpeg')] bg-contain">
 			<div className="w-full p-32 flex flex-col gap-12 bg-gradient-to-r from-green-300 via-green-300 to-green-200/0">
@@ -21,6 +44,15 @@ const GuestHero = () => {
 							Create an Account
 						</Button>
 					</Link>
+					<div className="mt-2">
+						<Button
+							size="lg"
+							className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold text-black"
+							onClick={() => guestSignIn()}
+						>
+							Sign in as Guest
+						</Button>
+					</div>
 					<p className="mt-2 text-lg">
 						Already have an account?{" "}
 						<Link href="/signin" className="font-semibold text-slate-800">
