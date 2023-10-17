@@ -18,7 +18,7 @@ const GuestHero = () => {
 							size="lg"
 							className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold"
 						>
-							Get Started - Create an Account
+							Create an Account
 						</Button>
 					</Link>
 					<p className="mt-2 text-lg">
