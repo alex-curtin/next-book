@@ -10,10 +10,14 @@ import { RouterOutputs } from "~/utils/api";
 
 dayjs.extend(relativeTime);
 
-type Book = RouterOutputs["posts"]["getUserFeed"][number]["book"];
-type Post = RouterOutputs["posts"]["getUserFeed"][number]["post"];
+type Book = RouterOutputs["posts"]["getUserFeed"]["feed"][number]["book"];
+type Post = RouterOutputs["posts"]["getUserFeed"]["feed"][number]["post"];
 
-const PostFeedItem = ({ book, post }: { book: Book; post: Post }) => {
+const PostFeedItem = ({
+	book,
+	post,
+	showUserInfo = true,
+}: { book: Book; post: Post; showUserInfo?: boolean }) => {
 	return (
 		<div key={post.id} className="flex gap-4 pb-4 mb-4 border-b">
 			<Link href={`/books/${book.googleId}`}>
@@ -28,22 +32,24 @@ const PostFeedItem = ({ book, post }: { book: Book; post: Post }) => {
 				</div>
 			</Link>
 			<div className="w-full">
-				<div className="flex gap-1 items-center pb-1">
-					<Avatar className="w-8 h-8">
-						<AvatarImage
-							src={post.poster?.imageUrl}
-							alt={post.poster?.username}
-						/>
-						<AvatarFallback>{post.poster?.username[0]}</AvatarFallback>
-					</Avatar>
-					<Link
-						href={`/users/${post.posterId}`}
-						className="font-semibold text-black/90"
-					>
-						@{post.poster?.username}
-					</Link>{" "}
-				</div>
-				<Link href={`/books/${book.googleId}`}>
+				{showUserInfo && (
+					<div className="flex gap-1 items-center pb-1">
+						<Avatar className="w-8 h-8">
+							<AvatarImage
+								src={post.poster?.imageUrl}
+								alt={post.poster?.username}
+							/>
+							<AvatarFallback>{post.poster?.username[0]}</AvatarFallback>
+						</Avatar>
+						<Link
+							href={`/users/${post.posterId}`}
+							className="font-semibold text-black/90"
+						>
+							@{post.poster?.username}
+						</Link>{" "}
+					</div>
+				)}
+				<Link href={`/posts/${post.id}`}>
 					<p className="font-bold text-black/80 text-xl">{book.title}</p>
 				</Link>
 				<p className="text-black/80">{book.subtitle}</p>

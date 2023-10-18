@@ -11,6 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { LoadSpinner } from "~/components/loading";
 import NotFound from "~/components/not-found";
+import PostFeedItem from "~/components/post-feed-item";
 
 const FollowButton = ({
 	following,
@@ -73,9 +74,9 @@ const SingleUserPage = ({ id }: { id: string }) => {
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col items-center p-4 max-w-2xl mx-auto">
+			<div className="flex flex-col p-4 mx-auto">
 				{!isLoadingUser && user && (
-					<div className="flex flex-col items-center gap-4 mb-8">
+					<div className="flex flex-col gap-4 mb-8 w-full items-center border-b pb-4">
 						<div className="flex gap-2">
 							<Avatar className="w-24 h-24">
 								<AvatarImage src={user.imageUrl} alt={user.username} />
@@ -84,7 +85,7 @@ const SingleUserPage = ({ id }: { id: string }) => {
 								</AvatarFallback>
 							</Avatar>
 							<div>
-								<h2 className="font-bold text-lg">{user.username}</h2>
+								<h2 className="font-bold text-xl">@{user.username}</h2>
 								<div className="text-sm text-black/80">
 									<p>joined {dayjs(user.createdAt).format("MMM DD, YYYY")}</p>
 									<p>
@@ -100,10 +101,12 @@ const SingleUserPage = ({ id }: { id: string }) => {
 							</div>
 						</div>
 						{currentUser && currentUser.id !== user.id && (
-							<FollowButton
-								following={user.followers.includes(currentUser.id)}
-								followedId={user.id}
-							/>
+							<div>
+								<FollowButton
+									following={user.followers.includes(currentUser.id)}
+									followedId={user.id}
+								/>
+							</div>
 						)}
 					</div>
 				)}
@@ -111,10 +114,12 @@ const SingleUserPage = ({ id }: { id: string }) => {
 				{postsData?.length ? (
 					<div className="flex flex-col gap-2">
 						{postsData.map(({ post, book }) => (
-							<div key={post.id}>
-								<BookItem book={book} />
-								<PostItem post={post} />
-							</div>
+							<PostFeedItem
+								key={post.id}
+								book={book}
+								post={post}
+								showUserInfo={false}
+							/>
 						))}
 					</div>
 				) : (

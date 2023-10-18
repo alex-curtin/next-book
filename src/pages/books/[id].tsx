@@ -169,7 +169,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 					{isLoadingRecs && <LoadSpinner size={24} />}
 					{recs && (
 						<div>
-							<h2 className="font-semibold">You might also like</h2>
+							<h2 className="font-semibold text-lg">You might also like</h2>
 							<HorizontalScroller>
 								{recs.map((book) => (
 									<BookItem book={book} key={book.googleId} />
@@ -181,16 +181,19 @@ const SingleBookPage = ({ id }: { id: string }) => {
 						<h2>Error getting recommendations. Please try again later.</h2>
 					)}
 					<hr />
-					{posts?.length ? (
-						<h2 className="font-semibold">User Reviews</h2>
-					) : (
-						<h2 className="font-semibold">No Reviews Yet</h2>
-					)}
-					<div className="w-1/2">
+					<div>
+						{posts?.length ? (
+							<h2 className="font-semibold text-lg">User Reviews</h2>
+						) : (
+							<h2 className="font-semibold text-lg">No Reviews Yet</h2>
+						)}
 						{posts
 							?.sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
 							.map((post) => (
-								<PostItem key={post.id} post={post} />
+								<div className="flex flex-col items-center">
+									<PostItem key={post.id} post={post} />
+									<div className="border-b w-4/5" />
+								</div>
 							))}
 					</div>
 				</div>

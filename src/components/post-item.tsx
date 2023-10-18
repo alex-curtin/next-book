@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Link from "next/link";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -6,19 +5,12 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import StarIcon from "./ui/icons/star-icon";
 import { RouterOutputs } from "~/utils/api";
-import { truncateString } from "~/utils/truncateString";
-import { useRouter } from "next/router";
 
 dayjs.extend(relativeTime);
 
-type PostWithPoster = RouterOutputs["posts"]["getAll"][number]["post"];
+type PostWithPoster = RouterOutputs["posts"]["getAll"]["feed"][number]["post"];
 
 const PostItem = ({ post }: { post: PostWithPoster }) => {
-	const router = useRouter();
-	const isPostPage = router.pathname === "/posts/[id]";
-	const [isExpanded, setIsExpanded] = useState(isPostPage);
-	const content = isPostPage ? post.content : truncateString(post.content);
-
 	return (
 		<div className="flex flex-col gap-4 py-4">
 			<div className="flex flex-col gap-1 w-full">
@@ -48,7 +40,9 @@ const PostItem = ({ post }: { post: PostWithPoster }) => {
 				</div>
 
 				<div className="w-full py-2 min-h-[96px]">
-					<p className="text-ellipsis text-sm">{post.content}</p>
+					<Link href={`/posts/${post.id}`}>
+						<p className="text-ellipsis text-sm">{post.content}</p>
+					</Link>
 				</div>
 			</div>
 		</div>
