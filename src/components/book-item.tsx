@@ -5,7 +5,7 @@ import { type Book } from "~/server/api/routers/google-api";
 import { RouterOutputs } from "~/utils/api";
 import { DEFAULT_IMG_URL } from "~/constants";
 
-type BookWithAuthors = RouterOutputs["posts"]["getAll"][number]["book"];
+type BookWithAuthors = RouterOutputs["posts"]["getAll"]["feed"][number]["book"];
 
 const truncateString = (str: string, maxLength = 500) =>
 	str.length <= maxLength ? str : `${str.slice(0, maxLength - 3)}...`;
