@@ -1,31 +1,49 @@
 import { api } from "~/utils/api";
-import PostItem from "~/components/post-item";
-import BookItem from "~/components/book-item";
-import { LoadSpinner } from "~/components/loading";
+import PostFeedItem from "./post-feed-item";
+import { LoadSpinner } from "./loading";
+import LoadMore from "./ui/load-more";
 
 const UserFeed = () => {
-	const { data: postsData, isLoading } = api.posts.getUserFeed.useQuery();
+	const {
+		data: postsData,
+		isLoading,
+		fetchNextPage,
+		isFetchingNextPage,
+	} = api.posts.getUserFeed.useInfiniteQuery(
+		{ postsPerPage: 5 },
+		{
+			getNextPageParam: (lastPage) => lastPage.nextCursor,
+		},
+	);
 
 	return (
-		<div className="flex flex-col max-w-2xl mx-auto">
-			{isLoading && <LoadSpinner />}
-			{!isLoading && postsData?.length ? (
-				<>
-					<h3 className="font-semibold mb-2">Your Feed</h3>
-					<div className="flex flex-col gap-2">
-						{postsData.map(({ post, book }) => (
-							<div key={post.id}>
-								<BookItem book={book} />
-								<PostItem post={post} />
-							</div>
-						))}
-					</div>
-				</>
-			) : (
-				<div>
-					<p>No posts in your feed</p>
+		<div className="flex flex-col mx-auto">
+			{isLoading && (
+				<div className="w-full py-4 flex justify-center">
+					<LoadSpinner size={48} />
 				</div>
 			)}
+			{postsData &&
+				(postsData.pages[0].feed.length > 0 ? (
+					<div className="flex flex-col gap-2">
+						{postsData.pages.map((page) =>
+							page.feed.map(({ post, book }) => (
+								<PostFeedItem key={post.id} book={book} post={post} />
+							)),
+						)}
+						<LoadMore action={fetchNextPage}>
+							{isFetchingNextPage && (
+								<div className="w-full flex justify-center px-2">
+									<LoadSpinner size={24} />
+								</div>
+							)}
+						</LoadMore>
+					</div>
+				) : (
+					<div className="text-center">
+						<p>Nothing in your feed! Follow some users to see their posts.</p>
+					</div>
+				))}
 		</div>
 	);
 };

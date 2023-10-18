@@ -13,12 +13,12 @@ const HorizontalScroller = ({ children }: { children: ReactNode }) => {
 	};
 
 	return (
-		<div className="flex">
+		<div className="flex w-full">
 			<button type="button" onClick={() => scroll(-250)} className="opacity-70">
 				<LeftArrow />
 			</button>
 			<div
-				className="flex flex-no-wrap overflow-x-scroll no-scrollbar scroll-smooth gap-4 py-2"
+				className="w-full flex flex-no-wrap overflow-x-scroll no-scrollbar scroll-smooth gap-4 py-2"
 				ref={scrollArea}
 			>
 				{children}

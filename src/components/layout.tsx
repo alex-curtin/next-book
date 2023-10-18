@@ -1,11 +1,19 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
+import NavBar from "./navbar";
 
-const PageLayout = (props: PropsWithChildren) => {
+const PageLayout = ({
+	children,
+	banner = null,
+}: { children: ReactNode; banner?: ReactNode }) => {
 	return (
 		<div className="h-screen">
-			<main className="flex flex-col items-center pt-16 w-full 2xl:max-w-[1536px] 2xl:mx-auto">
-				<div className="w-full">{props.children}</div>
-			</main>
+			<NavBar />
+			<div className="py-[72px]">
+				{banner}
+				<main className="flex flex-col items-center w-full 2xl:max-w-[1536px] 2xl:mx-auto">
+					<div className="w-full">{children}</div>
+				</main>
+			</div>
 		</div>
 	);
 };

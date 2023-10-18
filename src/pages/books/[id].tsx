@@ -1,7 +1,7 @@
+import { useEffect } from "react";
 import { type GetServerSideProps } from "next";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 
@@ -17,20 +17,26 @@ import PageLayout from "~/components/layout";
 import NotFound from "~/components/not-found";
 import BookItem from "~/components/book-item";
 import PostItem from "~/components/post-item";
-import { LoadSpinner } from "~/components/loading";
+import { LoadSpinner, LoadingPage } from "~/components/loading";
 import RatingSummary from "~/components/rating-summary";
 import HorizontalScroller from "~/components/ui/horizontal-scroller";
 
 const AddPost = ({ book }: { book: Book }) => {
-	const router = useRouter();
+	const ctx = api.useContext();
 	const [postContent, setPostContent] = useState("");
 	const [rating, setRating] = useState(3);
-	const { mutate } = api.posts.createPost.useMutation({
-		onSuccess: (post) => {
+	const { mutate, isLoading, isSuccess } = api.posts.createPost.useMutation({
+		onSuccess: () => {
 			toast("Post created!");
-			router.push(`/posts/${post.id}`);
+			ctx.books.getBookPostsByGoogleId.invalidate({ googleId: book.googleId });
 		},
 	});
+
+	useEffect(() => {
+		if (isSuccess) {
+			ctx.googleApi.getUserRecommendations.prefetch();
+		}
+	}, [isSuccess]);
 
 	const onClickCreate = () => {
 		if (postContent.length) {
@@ -52,35 +58,48 @@ const AddPost = ({ book }: { book: Book }) => {
 	};
 
 	return (
-		<div className="flex flex-col gap-1">
-			<div className="flex">
-				{Array.from({ length: 5 }).map((_, i) => (
-					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-					<button type="button" onClick={() => setRating(i + 1)} key={i}>
-						<StarIcon filled={i < rating} />
-					</button>
-				))}
+		<div className="flex justify-center">
+			<div className="w-full  flex flex-col gap-1">
+				<div className="flex">
+					{Array.from({ length: 5 }).map((_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						<button type="button" onClick={() => setRating(i + 1)} key={i}>
+							<StarIcon filled={i < rating} />
+						</button>
+					))}
+				</div>
+				<Textarea
+					name="post"
+					cols={60}
+					rows={5}
+					value={postContent}
+					placeholder="Review this book"
+					onChange={(e) => setPostContent(e.target.value)}
+					disabled={isLoading}
+				/>
+				<div className="self-end">
+					<Button
+						onClick={onClickCreate}
+						disabled={!postContent.length || isLoading}
+					>
+						{isLoading ? <LoadSpinner /> : "Post"}
+					</Button>
+				</div>
 			</div>
-			<Textarea
-				name="post"
-				cols={60}
-				rows={10}
-				value={postContent}
-				placeholder="Write a post about this book"
-				onChange={(e) => setPostContent(e.target.value)}
-			/>
-			<Button onClick={onClickCreate} disabled={!postContent.length}>
-				Post
-			</Button>
 		</div>
 	);
 };
 
 const SingleBookPage = ({ id }: { id: string }) => {
 	const { isSignedIn, user } = useUser();
-	const { data: book } = api.googleApi.getBookById.useQuery({ id });
+	const { data: book, isLoading: isLoadingBook } =
+		api.googleApi.getBookById.useQuery({ id });
 
 	if (!book) return <NotFound message="Book not found" />;
+
+	if (isLoadingBook) {
+		return <LoadingPage />;
+	}
 
 	const { data: posts } = api.books.getBookPostsByGoogleId.useQuery({
 		googleId: book.googleId,
@@ -104,7 +123,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col items-center py-4 px-24">
+			<div className="flex flex-col items-center p-4 lg:px-24">
 				<div className="flex flex-col p-4 gap-4 w-full">
 					<div className="flex gap-2">
 						<div className="h-auto">
@@ -122,7 +141,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 								<p className="text-black/80 text-xl">{book.subtitle}</p>
 							</Link>
 							{book.authors.map((author) => (
-								<Link key={author.name} href={`/authors/${author.name}`}>
+								<Link key={author.id} href={`/authors/${author.name}`}>
 									<p className="text-slate-700 font-bold">{author.name}</p>
 								</Link>
 							))}
@@ -140,15 +159,20 @@ const SingleBookPage = ({ id }: { id: string }) => {
 					</div>
 					<hr />
 					<div>
-						<p className="text-sm">{book.description}</p>
+						<p className="text-md text-black/90">{book.description}</p>
 					</div>
-					<hr />
 					{isSignedIn && !userHasReviewed ? (
-						<AddPost book={book} />
+						<>
+							<hr />
+							<AddPost book={book} />
+						</>
 					) : (
 						!isSignedIn && (
 							<div>
-								<Link href="/signin">Sign in</Link> to create a post
+								<Link href="/signin" className="font-semibold text-slate-800">
+									Sign in
+								</Link>{" "}
+								to create a post
 							</div>
 						)
 					)}
@@ -156,7 +180,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 					{isLoadingRecs && <LoadSpinner size={24} />}
 					{recs && (
 						<div>
-							<h2 className="font-semibold">You might also like</h2>
+							<h2 className="font-semibold text-lg">You might also like</h2>
 							<HorizontalScroller>
 								{recs.map((book) => (
 									<BookItem book={book} key={book.googleId} />
@@ -168,16 +192,19 @@ const SingleBookPage = ({ id }: { id: string }) => {
 						<h2>Error getting recommendations. Please try again later.</h2>
 					)}
 					<hr />
-					{posts?.length ? (
-						<h2 className="font-semibold">User Reviews</h2>
-					) : (
-						<h2 className="font-semibold">No Reviews Yet</h2>
-					)}
-					<div className="w-1/2">
+					<div>
+						{posts?.length ? (
+							<h2 className="font-semibold text-lg">User Reviews</h2>
+						) : (
+							<h2 className="font-semibold text-lg">No Reviews Yet</h2>
+						)}
 						{posts
 							?.sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
 							.map((post) => (
-								<PostItem key={post.id} post={post} />
+								<div className="flex flex-col items-center" key={post.id}>
+									<PostItem post={post} />
+									<div className="border-b w-4/5" />
+								</div>
 							))}
 					</div>
 				</div>

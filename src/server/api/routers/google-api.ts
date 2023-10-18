@@ -13,6 +13,11 @@ const redis = Redis.fromEnv();
 
 const BASE_URL = "https://www.googleapis.com/books/v1/volumes";
 
+const second = 1000;
+const minute = 60 * second;
+const hour = 60 * minute;
+const day = 24 * hour;
+
 const cleanHTMLString = (str: string) => str.replace(/<\/?[^>]+(>|$)/g, "");
 
 type GoogleBooksResult = {
@@ -35,6 +40,11 @@ export type Book = {
 	subtitle: string;
 	googleId: string;
 	description: string;
+};
+
+type UserRecommendationsCache = {
+	userBooks: string;
+	recommendations: Book[];
 };
 
 const transformBooks = (books: GoogleBooksResult[]): Book[] => {
@@ -124,6 +134,18 @@ export const googleApiRouter = createTRPCRouter({
 			};
 		}),
 
+	previewSearch: publicProcedure
+		.input(z.object({ term: z.string() }))
+		.query(async ({ input }) => {
+			if (!input.term) return;
+			const { data }: { data: { items: GoogleBooksResult[] } } =
+				await axios.get(
+					`${BASE_URL}?q=${input.term}&maxResults=10&key=${process.env.GOOGLE_API_KEY}`,
+				);
+
+			return transformBooks(data.items);
+		}),
+
 	getBookById: publicProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input }) => {
@@ -140,12 +162,15 @@ export const googleApiRouter = createTRPCRouter({
 			z.object({
 				author: z.string(),
 				titles: z.array(z.string()),
+				cursor: z.number().nullish(),
 			}),
 		)
 		.query(async ({ input }) => {
 			const { data }: { data: { items: GoogleBooksResult[] } } =
 				await axios.get(
-					`${BASE_URL}?q=${input.author}&maxResults=20&&key=${process.env.GOOGLE_API_KEY}`,
+					`${BASE_URL}?q=${input.author}&maxResults=20&startIndex=${
+						input.cursor || 0
+					}&key=${process.env.GOOGLE_API_KEY}`,
 				);
 
 			const transformedBooks = transformBooks(data.items);
@@ -155,7 +180,10 @@ export const googleApiRouter = createTRPCRouter({
 				)
 				.filter((book) => !input.titles.includes(book.title));
 
-			return filteredBooks.slice(0, 10);
+			return {
+				books: filteredBooks,
+				nextCursor: (input.cursor || 0) + 20,
+			};
 		}),
 
 	getRecommendations: publicProcedure
@@ -196,10 +224,6 @@ export const googleApiRouter = createTRPCRouter({
 			},
 		});
 
-		if (!userPosts.length) {
-			return [];
-		}
-
 		const userBooks = userPosts
 			.map((post) => {
 				const title = post.book.title;
@@ -208,15 +232,30 @@ export const googleApiRouter = createTRPCRouter({
 			})
 			.join("; ");
 
-		const cache: Book[] | null = await redis.get(userBooks);
+		const cache: UserRecommendationsCache | null = await redis.get(ctx.userId);
+
 		if (cache) {
-			return cache;
+			if (cache.userBooks === userBooks) {
+				return cache.recommendations;
+			}
 		}
 
-		const prompt = `Please recommend 5 books for someone who read the following books: ${userBooks}. Format as a JSON array of strings, ie "[title - author]".`;
+		const prompt = `Please recommend 5 books ${
+			userPosts.length > 0
+				? `for someone who read the following books: ${userBooks}. Be sure not to repeat any books from that list`
+				: "at random"
+		}.  Format as a JSON array of strings, ie "[title - author]".`;
+
 		const bookRecs = await getOpenAIRecommendations(prompt, 512);
 
-		await redis.set(userBooks, JSON.stringify(bookRecs));
+		await redis.set(
+			ctx.userId,
+			JSON.stringify({
+				userBooks,
+				recommendations: bookRecs,
+			}),
+			{ px: day },
+		);
 
 		return bookRecs;
 	}),
