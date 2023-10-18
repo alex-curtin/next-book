@@ -46,7 +46,7 @@ const SingleAuthorPage = ({ name }: { name: string }) => {
 					<PageHeader title={name} />
 				</div>
 				<div className="mb-8 min-w-[640px]">
-					<h2 className="self-start font-semibold px-4">
+					<h2 className="font-semibold px-4 text-lg">
 						{author?.books.length ? "User Reviewed" : "No reviews yet"}
 					</h2>
 					<div className="flex">
@@ -63,7 +63,7 @@ const SingleAuthorPage = ({ name }: { name: string }) => {
 				{isLoadingGoogleBooks && <LoadSpinner size={36} />}
 				{googleBooks?.pages.length && (
 					<div className="w-full">
-						<h2 className="self-start font-semibold px-4">
+						<h2 className="font-semibold px-4 text-lg">
 							{author?.books.length ? `More by ${name}` : `Books by ${name}`}
 						</h2>
 						<div className="flex flex-wrap gap-2">

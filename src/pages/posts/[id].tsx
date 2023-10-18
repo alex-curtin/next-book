@@ -75,7 +75,7 @@ const EditPost = ({
 			<Textarea
 				name="post"
 				cols={60}
-				rows={10}
+				rows={5}
 				value={postContent}
 				placeholder="Write a post about this book"
 				onChange={(e) => setPostContent(e.target.value)}

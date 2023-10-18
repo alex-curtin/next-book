@@ -12,7 +12,7 @@ type PostWithPoster = RouterOutputs["posts"]["getAll"]["feed"][number]["post"];
 
 const PostItem = ({ post }: { post: PostWithPoster }) => {
 	return (
-		<div className="flex flex-col gap-4 py-4">
+		<div className="flex flex-col gap-4 py-4 w-full">
 			<div className="flex flex-col gap-1 w-full">
 				<div className="flex gap-2">
 					<Avatar>

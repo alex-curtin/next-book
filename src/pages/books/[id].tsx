@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { type GetServerSideProps } from "next";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 
@@ -18,7 +17,7 @@ import PageLayout from "~/components/layout";
 import NotFound from "~/components/not-found";
 import BookItem from "~/components/book-item";
 import PostItem from "~/components/post-item";
-import { LoadSpinner } from "~/components/loading";
+import { LoadSpinner, LoadingPage } from "~/components/loading";
 import RatingSummary from "~/components/rating-summary";
 import HorizontalScroller from "~/components/ui/horizontal-scroller";
 
@@ -59,39 +58,48 @@ const AddPost = ({ book }: { book: Book }) => {
 	};
 
 	return (
-		<div className="flex flex-col gap-1">
-			<div className="flex">
-				{Array.from({ length: 5 }).map((_, i) => (
-					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-					<button type="button" onClick={() => setRating(i + 1)} key={i}>
-						<StarIcon filled={i < rating} />
-					</button>
-				))}
+		<div className="flex justify-center">
+			<div className="w-full  flex flex-col gap-1">
+				<div className="flex">
+					{Array.from({ length: 5 }).map((_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						<button type="button" onClick={() => setRating(i + 1)} key={i}>
+							<StarIcon filled={i < rating} />
+						</button>
+					))}
+				</div>
+				<Textarea
+					name="post"
+					cols={60}
+					rows={5}
+					value={postContent}
+					placeholder="Review this book"
+					onChange={(e) => setPostContent(e.target.value)}
+					disabled={isLoading}
+				/>
+				<div className="self-end">
+					<Button
+						onClick={onClickCreate}
+						disabled={!postContent.length || isLoading}
+					>
+						{isLoading ? <LoadSpinner /> : "Post"}
+					</Button>
+				</div>
 			</div>
-			<Textarea
-				name="post"
-				cols={60}
-				rows={10}
-				value={postContent}
-				placeholder="Review this book"
-				onChange={(e) => setPostContent(e.target.value)}
-				disabled={isLoading}
-			/>
-			<Button
-				onClick={onClickCreate}
-				disabled={!postContent.length || isLoading}
-			>
-				{isLoading ? <LoadSpinner /> : "Post"}
-			</Button>
 		</div>
 	);
 };
 
 const SingleBookPage = ({ id }: { id: string }) => {
 	const { isSignedIn, user } = useUser();
-	const { data: book } = api.googleApi.getBookById.useQuery({ id });
+	const { data: book, isLoading: isLoadingBook } =
+		api.googleApi.getBookById.useQuery({ id });
 
 	if (!book) return <NotFound message="Book not found" />;
+
+	if (isLoadingBook) {
+		return <LoadingPage />;
+	}
 
 	const { data: posts } = api.books.getBookPostsByGoogleId.useQuery({
 		googleId: book.googleId,
@@ -151,7 +159,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 					</div>
 					<hr />
 					<div>
-						<p className="text-sm">{book.description}</p>
+						<p className="text-md text-black/90">{book.description}</p>
 					</div>
 					{isSignedIn && !userHasReviewed ? (
 						<>
@@ -161,7 +169,10 @@ const SingleBookPage = ({ id }: { id: string }) => {
 					) : (
 						!isSignedIn && (
 							<div>
-								<Link href="/signin">Sign in</Link> to create a post
+								<Link href="/signin" className="font-semibold text-slate-800">
+									Sign in
+								</Link>{" "}
+								to create a post
 							</div>
 						)
 					)}

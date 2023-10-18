@@ -1,8 +1,4 @@
 import PageLayout from "~/components/layout";
-import { api } from "~/utils/api";
-import PostItem from "~/components/post-item";
-import BookItem from "~/components/book-item";
-import { LoadSpinner } from "~/components/loading";
 import { generateSSHelper } from "~/server/helpers/generateSSHelper";
 import GuestFeed from "~/components/guest-feed";
 

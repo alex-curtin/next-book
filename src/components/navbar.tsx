@@ -20,7 +20,7 @@ const NavBar = () => {
 		<nav className="w-full z-30 flex justify-between items-center px-8 py-4 bg-green-300 fixed">
 			<Link href="/" className="flex items-center gap-2">
 				<BookIcon />
-				<h1 className="text-lg font-bold text-black/80">NextBook</h1>
+				<h1 className="text-xl font-bold text-black/80">NextBook</h1>
 			</Link>
 			<div className="flex gap-8 items-center">
 				<SearchBar expand={true} auto={true} />

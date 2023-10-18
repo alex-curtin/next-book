@@ -49,7 +49,7 @@ const PostFeedItem = ({
 						</Link>{" "}
 					</div>
 				)}
-				<Link href={`/posts/${post.id}`}>
+				<Link href={`/books/${book.googleId}`}>
 					<p className="font-bold text-black/80 text-xl">{book.title}</p>
 				</Link>
 				<p className="text-black/80">{book.subtitle}</p>
@@ -67,7 +67,9 @@ const PostFeedItem = ({
 					</p>
 				</div>
 				<div className="mt-6">
-					<p className="text-black/90">{post.content}</p>
+					<Link href={`/posts/${post.id}`}>
+						<p className="text-black/90 text-sm">{post.content}</p>
+					</Link>
 				</div>
 			</div>
 		</div>
