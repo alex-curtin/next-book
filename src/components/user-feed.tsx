@@ -1,9 +1,20 @@
 import { api } from "~/utils/api";
 import PostFeedItem from "./post-feed-item";
 import { LoadSpinner } from "./loading";
+import LoadMore from "./ui/load-more";
 
 const UserFeed = () => {
-	const { data: postsData, isLoading } = api.posts.getUserFeed.useQuery();
+	const {
+		data: postsData,
+		isLoading,
+		fetchNextPage,
+		isFetchingNextPage,
+	} = api.posts.getUserFeed.useInfiniteQuery(
+		{ postsPerPage: 5 },
+		{
+			getNextPageParam: (lastPage) => lastPage.nextCursor,
+		},
+	);
 
 	return (
 		<div className="flex flex-col mx-auto">
@@ -13,11 +24,20 @@ const UserFeed = () => {
 				</div>
 			)}
 			{postsData &&
-				(postsData.length > 0 ? (
+				(postsData.pages.length > 0 ? (
 					<div className="flex flex-col gap-2">
-						{postsData.map(({ post, book }) => (
-							<PostFeedItem key={post.id} book={book} post={post} />
-						))}
+						{postsData.pages.map((page) =>
+							page.feed.map(({ post, book }) => (
+								<PostFeedItem key={post.id} book={book} post={post} />
+							)),
+						)}
+						<LoadMore action={fetchNextPage}>
+							{isFetchingNextPage && (
+								<div className="w-full flex justify-center px-2">
+									<LoadSpinner size={24} />
+								</div>
+							)}
+						</LoadMore>
 					</div>
 				) : (
 					<div className="text-center">

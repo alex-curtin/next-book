@@ -232,26 +232,38 @@ export const postsRouter = createTRPCRouter({
 			return formattedPost;
 		}),
 
-	getAll: publicProcedure.query(async ({ ctx }) => {
-		const allPosts = await ctx.db.query.posts.findMany({
-			orderBy: [desc(posts.createdAt)],
-			with: {
-				book: {
-					with: {
-						bookAuthors: {
-							with: {
-								author: true,
+	getAll: publicProcedure
+		.input(
+			z.object({
+				cursor: z.number().nullish(),
+				postsPerPage: z.number().default(5),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const allPosts = await ctx.db.query.posts.findMany({
+				orderBy: [desc(posts.createdAt)],
+				limit: input.postsPerPage,
+				offset: (input.cursor || 0) + input.postsPerPage,
+				with: {
+					book: {
+						with: {
+							bookAuthors: {
+								with: {
+									author: true,
+								},
 							},
 						},
 					},
 				},
-			},
-		});
+			});
 
-		const formattedPosts = formatPosts(allPosts);
+			const formattedPosts = await formatPosts(allPosts);
 
-		return formattedPosts;
-	}),
+			return {
+				feed: formattedPosts,
+				nextCursor: (input.cursor || 0) + input.postsPerPage,
+			};
+		}),
 
 	getAllByUser: publicProcedure
 		.input(z.object({ id: z.string() }))
@@ -315,33 +327,45 @@ export const postsRouter = createTRPCRouter({
 			return postsWithPosters;
 		}),
 
-	getUserFeed: privateProcedure.query(async ({ ctx }) => {
-		const following = await ctx.db.query.follows.findMany({
-			where: eq(follows.followerId, ctx.userId),
-		});
+	getUserFeed: privateProcedure
+		.input(
+			z.object({
+				cursor: z.number().nullish(),
+				postsPerPage: z.number().default(5),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const following = await ctx.db.query.follows.findMany({
+				where: eq(follows.followerId, ctx.userId),
+			});
 
-		const followinIds = following.map((f) => f.followedId);
+			const followinIds = following.map((f) => f.followedId);
 
-		const postFeed = await ctx.db.query.posts.findMany({
-			where: inArray(posts.posterId, [...followinIds, ctx.userId]),
-			orderBy: [desc(posts.createdAt)],
-			with: {
-				book: {
-					with: {
-						bookAuthors: {
-							with: {
-								author: true,
+			const postFeed = await ctx.db.query.posts.findMany({
+				where: inArray(posts.posterId, [...followinIds, ctx.userId]),
+				orderBy: [desc(posts.createdAt)],
+				limit: input.postsPerPage,
+				offset: input.cursor || 0,
+				with: {
+					book: {
+						with: {
+							bookAuthors: {
+								with: {
+									author: true,
+								},
 							},
 						},
 					},
 				},
-			},
-		});
+			});
 
-		const formattedFeed = await formatPosts(postFeed);
+			const formattedFeed = await formatPosts(postFeed);
 
-		return formattedFeed;
-	}),
+			return {
+				feed: formattedFeed,
+				nextCursor: (input.cursor || 0) + input.postsPerPage,
+			};
+		}),
 
 	edit: privateProcedure
 		.input(
