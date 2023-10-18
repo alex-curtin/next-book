@@ -224,10 +224,6 @@ export const googleApiRouter = createTRPCRouter({
 			},
 		});
 
-		if (!userPosts.length) {
-			return [];
-		}
-
 		const userBooks = userPosts
 			.map((post) => {
 				const title = post.book.title;
@@ -244,7 +240,12 @@ export const googleApiRouter = createTRPCRouter({
 			}
 		}
 
-		const prompt = `Please recommend 5 books for someone who read the following books: ${userBooks}. Be sure not to repeat any books from that list. Format as a JSON array of strings, ie "[title - author]".`;
+		const prompt = `Please recommend 5 books ${
+			userPosts.length > 0
+				? `for someone who read the following books: ${userBooks}. Be sure not to repeat any books from that list`
+				: "at random"
+		}.  Format as a JSON array of strings, ie "[title - author]".`;
+
 		const bookRecs = await getOpenAIRecommendations(prompt, 512);
 
 		await redis.set(
