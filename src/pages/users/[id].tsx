@@ -74,7 +74,7 @@ const SingleUserPage = ({ id }: { id: string }) => {
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col p-4 mx-auto">
+			<div className="flex flex-col py-4 px-24">
 				{!isLoadingUser && user && (
 					<div className="flex flex-col gap-4 mb-8 w-full items-center border-b pb-4">
 						<div className="flex gap-2">

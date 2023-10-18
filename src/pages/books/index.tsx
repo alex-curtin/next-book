@@ -14,7 +14,7 @@ const AllBooksPage = () => {
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col p-8 mx-auto">
+			<div className="flex flex-col p-4 lg:px-16">
 				<div className="mb-4">
 					<PageHeader title="All Reviewed Books" />
 				</div>

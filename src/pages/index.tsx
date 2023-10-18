@@ -102,7 +102,7 @@ const Home = () => {
 
 	return (
 		<PageLayout banner={isSignedIn ? null : <GuestHero />}>
-			<div className="flex flex-col items-center px-8 pt-4">
+			<div className="flex flex-col items-center px-4 lg:px-12 py-4">
 				<Tabs defaultValue="books" className="w-full">
 					<TabsList className="w-full">
 						<TabsTrigger value="books" className="w-full">

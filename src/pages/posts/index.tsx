@@ -7,7 +7,7 @@ import PageHeader from "~/components/ui/page-header";
 const AllPostsPage = () => {
 	return (
 		<PageLayout>
-			<div className="p-8">
+			<div className="p-4 lg:px-24">
 				<div className="mb-4">
 					<PageHeader title="All Posts" />
 				</div>

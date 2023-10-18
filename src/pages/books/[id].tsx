@@ -123,7 +123,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col items-center py-4 px-24">
+			<div className="flex flex-col items-center p-4 lg:px-24">
 				<div className="flex flex-col p-4 gap-4 w-full">
 					<div className="flex gap-2">
 						<div className="h-auto">
