@@ -133,7 +133,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 								<p className="text-black/80 text-xl">{book.subtitle}</p>
 							</Link>
 							{book.authors.map((author) => (
-								<Link key={author.name} href={`/authors/${author.name}`}>
+								<Link key={author.id} href={`/authors/${author.name}`}>
 									<p className="text-slate-700 font-bold">{author.name}</p>
 								</Link>
 							))}
@@ -190,8 +190,8 @@ const SingleBookPage = ({ id }: { id: string }) => {
 						{posts
 							?.sort((a, b) => Number(b.createdAt) - Number(a.createdAt))
 							.map((post) => (
-								<div className="flex flex-col items-center">
-									<PostItem key={post.id} post={post} />
+								<div className="flex flex-col items-center" key={post.id}>
+									<PostItem post={post} />
 									<div className="border-b w-4/5" />
 								</div>
 							))}
