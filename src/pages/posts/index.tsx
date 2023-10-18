@@ -4,29 +4,18 @@ import PostItem from "~/components/post-item";
 import BookItem from "~/components/book-item";
 import { LoadSpinner } from "~/components/loading";
 import { generateSSHelper } from "~/server/helpers/generateSSHelper";
+import GuestFeed from "~/components/guest-feed";
 
 import PageHeader from "~/components/ui/page-header";
 
 const AllPostsPage = () => {
-	const { data: postsData, isLoading } = api.posts.getAll.useQuery();
-
 	return (
 		<PageLayout>
-			<div className="flex flex-col items-center p-4 max-w-2xl mx-auto">
-				<PageHeader title="Recent Posts" />
-				{isLoading && <LoadSpinner />}
-				{postsData?.length ? (
-					<div className="flex flex-col gap-2">
-						{postsData.map(({ post, book }) => (
-							<div key={post.id}>
-								<BookItem book={book} />
-								<PostItem post={post} />
-							</div>
-						))}
-					</div>
-				) : (
-					<p>No posts</p>
-				)}
+			<div className="p-8">
+				<div className="mb-4">
+					<PageHeader title="All Posts" />
+				</div>
+				<GuestFeed />
 			</div>
 		</PageLayout>
 	);
@@ -37,7 +26,7 @@ export default AllPostsPage;
 export const getServerSideProps = async () => {
 	const ssHelper = generateSSHelper();
 
-	await ssHelper.posts.getAll.prefetch();
+	await ssHelper.posts.getAll.prefetchInfinite({ postsPerPage: 5 });
 
 	return {
 		props: {

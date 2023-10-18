@@ -23,10 +23,10 @@ const CategoryPage = ({ id }: { id: string }) => {
 	return (
 		<PageLayout>
 			<div className="p-8">
-				<div className="pb-6">
+				<div className="pb-4">
 					<PageHeader title={category.name} />
 				</div>
-				<div className="flex flex-wrap gap-6">
+				<div className="flex flex-wrap gap-4">
 					{category.books.map((book) => (
 						<div key={book.id} className="w-[300px]">
 							<BookItem book={book} />

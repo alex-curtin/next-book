@@ -26,6 +26,7 @@ const SingleAuthorPage = ({ name }: { name: string }) => {
 		data: googleBooks,
 		fetchNextPage,
 		isLoading: isLoadingGoogleBooks,
+		isFetchingNextPage,
 	} = api.googleApi.getBooksByAuthor.useInfiniteQuery(
 		{
 			author: name,
@@ -76,9 +77,11 @@ const SingleAuthorPage = ({ name }: { name: string }) => {
 						</div>
 						<div className="flex justify-center">
 							<LoadMore action={fetchNextPage}>
-								<Button variant="link" onClick={() => fetchNextPage()}>
-									load more
-								</Button>
+								{isFetchingNextPage && (
+									<div className="w-full flex justify-center py-2">
+										<LoadSpinner size={24} />
+									</div>
+								)}
 							</LoadMore>
 						</div>
 					</div>

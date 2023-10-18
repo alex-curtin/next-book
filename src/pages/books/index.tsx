@@ -14,16 +14,23 @@ const AllBooksPage = () => {
 
 	return (
 		<PageLayout>
-			<div className="flex flex-col items-center p-4 max-w-2xl m-auto gap-6">
-				<PageHeader title="Popular Books" />
-				{data?.map((book) => {
-					return (
-						<div key={book.bookData.id} className="w-full flex flex-col gap-1">
-							<BookItem book={book.bookData} />
-							<RatingSummary posts={book.posts} />
-						</div>
-					);
-				})}
+			<div className="flex flex-col p-8 mx-auto">
+				<div className="mb-4">
+					<PageHeader title="All Reviewed Books" />
+				</div>
+				<div className="flex flex-wrap gap-4">
+					{data?.map((book) => {
+						return (
+							<div
+								key={book.bookData.id}
+								className="flex flex-col gap-1 w-[300px]"
+							>
+								<BookItem book={book.bookData} />
+								<RatingSummary posts={book.posts} />
+							</div>
+						);
+					})}
+				</div>
 			</div>
 		</PageLayout>
 	);

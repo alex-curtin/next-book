@@ -24,7 +24,7 @@ const UserFeed = () => {
 				</div>
 			)}
 			{postsData &&
-				(postsData.pages.length > 0 ? (
+				(postsData.pages[0].feed.length > 0 ? (
 					<div className="flex flex-col gap-2">
 						{postsData.pages.map((page) =>
 							page.feed.map(({ post, book }) => (
