@@ -8,10 +8,12 @@ const PageLayout = ({
 	return (
 		<div className="h-screen">
 			<NavBar />
-			{banner}
-			<main className="flex flex-col items-center py-20 w-full 2xl:max-w-[1536px] 2xl:mx-auto">
-				<div className="w-full">{children}</div>
-			</main>
+			<div className="py-[72px]">
+				{banner}
+				<main className="flex flex-col items-center w-full 2xl:max-w-[1536px] 2xl:mx-auto">
+					<div className="w-full">{children}</div>
+				</main>
+			</div>
 		</div>
 	);
 };

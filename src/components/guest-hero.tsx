@@ -28,32 +28,34 @@ const GuestHero = () => {
 
 	return (
 		<div className="bg-green-300 w-full lg:bg-[url('/hero-image.jpeg')] bg-contain">
-			<div className="w-full p-32 flex flex-col gap-12 bg-gradient-to-r from-green-300 via-green-300 to-green-200/0">
+			<div className="w-full p-28 flex flex-col gap-12 bg-gradient-to-r from-green-300 via-green-300 to-green-200/0">
 				<div>
 					<p className="text-3xl">Welcome bibliophile!</p>
 					<p className="text-3xl">Discover new reading material.</p>
 					<p className="text-3xl">Rate and review your favorite books.</p>
 				</div>
 				<div className="w-fit text-center">
-					<Link href="/signup">
-						<Button
-							variant="secondary"
-							size="lg"
-							className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold"
-						>
-							Create an Account
-						</Button>
-					</Link>
-					<div className="mt-2">
-						<Button
-							size="lg"
-							className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold text-black"
-							onClick={() => guestSignIn()}
-						>
-							Sign in as Guest
-						</Button>
+					<div className="flex flex-col md:flex-row items-center gap-4">
+						<Link href="/signup">
+							<Button
+								variant="secondary"
+								size="lg"
+								className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold"
+							>
+								Create an Account
+							</Button>
+						</Link>
+						<div className="">
+							<Button
+								size="lg"
+								className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold text-black"
+								onClick={() => guestSignIn()}
+							>
+								Use Guest Account
+							</Button>
+						</div>
 					</div>
-					<p className="mt-2 text-lg">
+					<p className="mt-4 text-lg">
 						Already have an account?{" "}
 						<Link href="/signin" className="font-semibold text-slate-800">
 							Sign In
