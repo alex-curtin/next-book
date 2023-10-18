@@ -94,7 +94,7 @@ const RecommendationsSection = () => {
 
 const Home = () => {
 	const { isSignedIn, user, isLoaded } = useUser();
-	const { data, isLoading } = api.categories.getPrimary.useQuery();
+	const { data } = api.categories.getPrimary.useQuery();
 
 	if (!isLoaded) {
 		return <LoadingPage />;

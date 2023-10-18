@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { type GetServerSideProps } from "next";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
@@ -22,15 +23,21 @@ import RatingSummary from "~/components/rating-summary";
 import HorizontalScroller from "~/components/ui/horizontal-scroller";
 
 const AddPost = ({ book }: { book: Book }) => {
-	const router = useRouter();
+	const ctx = api.useContext();
 	const [postContent, setPostContent] = useState("");
 	const [rating, setRating] = useState(3);
-	const { mutate, isLoading } = api.posts.createPost.useMutation({
-		onSuccess: (post) => {
+	const { mutate, isLoading, isSuccess } = api.posts.createPost.useMutation({
+		onSuccess: () => {
 			toast("Post created!");
-			router.push(`/posts/${post.id}`);
+			ctx.books.getBookPostsByGoogleId.invalidate({ googleId: book.googleId });
 		},
 	});
+
+	useEffect(() => {
+		if (isSuccess) {
+			ctx.googleApi.getUserRecommendations.prefetch();
+		}
+	}, [isSuccess]);
 
 	const onClickCreate = () => {
 		if (postContent.length) {
@@ -68,6 +75,7 @@ const AddPost = ({ book }: { book: Book }) => {
 				value={postContent}
 				placeholder="Review this book"
 				onChange={(e) => setPostContent(e.target.value)}
+				disabled={isLoading}
 			/>
 			<Button
 				onClick={onClickCreate}

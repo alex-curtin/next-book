@@ -12,13 +12,18 @@ const UserFeed = () => {
 					<LoadSpinner size={48} />
 				</div>
 			)}
-			{postsData?.length && (
-				<div className="flex flex-col gap-2">
-					{postsData.map(({ post, book }) => (
-						<PostFeedItem key={post.id} book={book} post={post} />
-					))}
-				</div>
-			)}
+			{postsData &&
+				(postsData.length > 0 ? (
+					<div className="flex flex-col gap-2">
+						{postsData.map(({ post, book }) => (
+							<PostFeedItem key={post.id} book={book} post={post} />
+						))}
+					</div>
+				) : (
+					<div className="text-center">
+						<p>Nothing in your feed! Follow some users to see their posts.</p>
+					</div>
+				))}
 		</div>
 	);
 };
