@@ -1,14 +1,19 @@
+import { useState } from "react";
 import Link from "next/link";
 import { useSignIn } from "@clerk/nextjs";
-
-import { Button } from "./ui/button";
 import toast from "react-hot-toast";
+
+import { LoadSpinner } from "./loading";
+import { Button } from "./ui/button";
 
 const GuestHero = () => {
 	const { isLoaded, signIn, setActive } = useSignIn();
+	const [isSigningIn, setIsSigningIn] = useState(false);
 
 	const guestSignIn = async () => {
 		if (!isLoaded) return;
+
+		setIsSigningIn(true);
 
 		try {
 			const { status, createdSessionId } = await signIn.create({
@@ -20,9 +25,11 @@ const GuestHero = () => {
 				setActive({ session: createdSessionId });
 			} else {
 				toast("Error logging in as guest");
+				setIsSigningIn(false);
 			}
 		} catch (error) {
 			toast("Error logging in as guest");
+			setIsSigningIn(false);
 		}
 	};
 
@@ -48,10 +55,18 @@ const GuestHero = () => {
 						<div className="">
 							<Button
 								size="lg"
-								className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold text-black"
+								className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold text-black relative"
 								onClick={() => guestSignIn()}
+								disabled={isSigningIn}
 							>
-								Use Guest Account
+								<span className={`${isSigningIn ? "invisible" : ""}`}>
+									Use Guest Account
+								</span>
+								{isSigningIn && (
+									<span className="absolute top-0 w-full h-full flex items-center justify-center">
+										<LoadSpinner size={24} />
+									</span>
+								)}
 							</Button>
 						</div>
 					</div>
