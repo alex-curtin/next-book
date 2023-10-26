@@ -254,7 +254,6 @@ export const googleApiRouter = createTRPCRouter({
 				userBooks,
 				recommendations: bookRecs,
 			}),
-			{ px: day },
 		);
 
 		return bookRecs;

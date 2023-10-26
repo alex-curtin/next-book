@@ -20,6 +20,8 @@ import PostItem from "~/components/post-item";
 import { LoadSpinner, LoadingPage } from "~/components/loading";
 import RatingSummary from "~/components/rating-summary";
 import HorizontalScroller from "~/components/ui/horizontal-scroller";
+import BookItemSkeleton from "~/components/book-item-skeleton";
+import { Skeleton } from "~/components/ui/skeleton";
 
 const AddPost = ({ book }: { book: Book }) => {
 	const ctx = api.useContext();
@@ -32,6 +34,7 @@ const AddPost = ({ book }: { book: Book }) => {
 		},
 	});
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (isSuccess) {
 			ctx.googleApi.getUserRecommendations.prefetch();
@@ -141,7 +144,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 								<p className="text-black/80 text-xl">{book.subtitle}</p>
 							</Link>
 							{book.authors.map((author) => (
-								<Link key={author.id} href={`/authors/${author.name}`}>
+								<Link key={author.name} href={`/authors/${author.name}`}>
 									<p className="text-slate-700 font-bold">{author.name}</p>
 								</Link>
 							))}
@@ -177,7 +180,15 @@ const SingleBookPage = ({ id }: { id: string }) => {
 						)
 					)}
 					<hr />
-					{isLoadingRecs && <LoadSpinner size={24} />}
+					{isLoadingRecs && (
+						<div>
+							<HorizontalScroller>
+								{Array.from({ length: 4 }).map((_, i) => (
+									<BookItemSkeleton key={`skeleton-${i}`} />
+								))}
+							</HorizontalScroller>
+						</div>
+					)}
 					{recs && (
 						<div>
 							<h2 className="font-semibold text-lg">You might also like</h2>
