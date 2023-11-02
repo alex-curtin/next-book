@@ -41,7 +41,7 @@ const GuestHero = () => {
 					<p className="text-3xl">Discover new reading material.</p>
 					<p className="text-3xl">Rate and review your favorite books.</p>
 				</div>
-				<div className="w-fit text-center">
+				<div>
 					<div className="flex flex-col md:flex-row items-center gap-4">
 						<Link href="/signup">
 							<Button
