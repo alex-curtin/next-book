@@ -21,7 +21,7 @@ const PostFeedItem = ({
 	return (
 		<div key={post.id} className="flex gap-4 pb-4 mb-4 border-b">
 			<Link href={`/books/${book.googleId}`}>
-				<div className="h-auto w-[125px]">
+				<div className="h-auto w-[125px] hover:brightness-105">
 					<Image
 						src={book.imageUrl || DEFAULT_IMG_URL}
 						alt={book.title}
@@ -43,19 +43,21 @@ const PostFeedItem = ({
 						</Avatar>
 						<Link
 							href={`/users/${post.posterId}`}
-							className="font-semibold text-black/90"
+							className="font-semibold text-black/90 hover:opacity-80"
 						>
 							@{post.poster?.username}
 						</Link>{" "}
 					</div>
 				)}
-				<Link href={`/books/${book.googleId}`}>
+				<Link href={`/books/${book.googleId}`} className="hover:opacity-80">
 					<p className="font-bold text-black/80 text-xl">{book.title}</p>
+					<p className="text-black/80">{book.subtitle}</p>
 				</Link>
-				<p className="text-black/80">{book.subtitle}</p>
 				{book.authors.map((author) => (
 					<Link key={author.id} href={`/authors/${author.name}`}>
-						<p className="text-slate-800 font-semibold">{author.name}</p>
+						<p className="text-slate-800 font-semibold hover:opacity-80">
+							{author.name}
+						</p>
 					</Link>
 				))}
 				<div className="flex items-center mt-2">

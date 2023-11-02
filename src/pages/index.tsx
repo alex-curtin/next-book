@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import UserFeed from "~/components/user-feed";
 import GuestFeed from "~/components/guest-feed";
 import { LoadingPage } from "~/components/loading";
+import BookItemSkeleton from "~/components/book-item-skeleton";
 
 type Category = RouterOutputs["categories"]["getPrimary"][number];
 
@@ -22,7 +23,7 @@ const CategorySection = ({ category }: { category: Category }) => {
 				<h2 className="text-lg font-bold capitalize">{category.name}</h2>
 				<Link
 					href={`/categories/${category.id}`}
-					className="text-sm text-blue-800"
+					className="text-sm font-semibold text-blue-800 hover:opacity-80"
 				>
 					see more
 				</Link>
@@ -69,14 +70,7 @@ const RecommendationsSection = () => {
 				{(isLoading || isFetching) && (
 					<>
 						{Array.from({ length: 4 }).map((_, i) => (
-							<div key={`skeleton-${i}`} className="flex">
-								<Skeleton className="w-[125px] h-[191px]" />
-								<div className="flex flex-col gap-1 px-2">
-									<Skeleton className="w-[120px] h-5" />
-									<Skeleton className="w-[80px] h-5" />
-									<Skeleton className="w-[100px] h-5" />
-								</div>
-							</div>
+							<BookItemSkeleton key={`skeleton-${i}`} />
 						))}
 					</>
 				)}

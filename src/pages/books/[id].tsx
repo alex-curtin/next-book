@@ -20,6 +20,8 @@ import PostItem from "~/components/post-item";
 import { LoadSpinner, LoadingPage } from "~/components/loading";
 import RatingSummary from "~/components/rating-summary";
 import HorizontalScroller from "~/components/ui/horizontal-scroller";
+import BookItemSkeleton from "~/components/book-item-skeleton";
+import { Skeleton } from "~/components/ui/skeleton";
 
 const AddPost = ({ book }: { book: Book }) => {
 	const ctx = api.useContext();
@@ -32,6 +34,7 @@ const AddPost = ({ book }: { book: Book }) => {
 		},
 	});
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (isSuccess) {
 			ctx.googleApi.getUserRecommendations.prefetch();
@@ -95,15 +98,18 @@ const SingleBookPage = ({ id }: { id: string }) => {
 	const { data: book, isLoading: isLoadingBook } =
 		api.googleApi.getBookById.useQuery({ id });
 
-	if (!book) return <NotFound message="Book not found" />;
-
 	if (isLoadingBook) {
 		return <LoadingPage />;
 	}
 
-	const { data: posts } = api.books.getBookPostsByGoogleId.useQuery({
-		googleId: book.googleId,
-	});
+	if (!book) return <NotFound message="Book not found" />;
+
+	const { data: posts } = api.books.getBookPostsByGoogleId.useQuery(
+		{
+			googleId: book.googleId,
+		},
+		{ enabled: !!book },
+	);
 
 	const userHasReviewed =
 		user && posts
@@ -118,7 +124,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 		{
 			book: `${book.title} by ${book.authors[0].name}`,
 		},
-		{ retry: false },
+		{ retry: false, enabled: !!book },
 	);
 
 	return (
@@ -136,13 +142,13 @@ const SingleBookPage = ({ id }: { id: string }) => {
 							/>
 						</div>
 						<div className="flex flex-col">
-							<Link href={`/books/${book.googleId}`}>
-								<h2 className="text-black/80 text-3xl">{book.title}</h2>
-								<p className="text-black/80 text-xl">{book.subtitle}</p>
-							</Link>
+							<h2 className="text-black/80 text-3xl">{book.title}</h2>
+							<p className="text-black/80 text-xl">{book.subtitle}</p>
 							{book.authors.map((author) => (
-								<Link key={author.id} href={`/authors/${author.name}`}>
-									<p className="text-slate-700 font-bold">{author.name}</p>
+								<Link key={author.name} href={`/authors/${author.name}`}>
+									<p className="text-slate-700 font-bold hover:opacity-80">
+										{author.name}
+									</p>
 								</Link>
 							))}
 							<div className="mt-auto">
@@ -170,14 +176,28 @@ const SingleBookPage = ({ id }: { id: string }) => {
 						!isSignedIn && (
 							<div>
 								<Link href="/signin" className="font-semibold text-slate-800">
-									Sign in
+									<Button
+										size="sm"
+										variant="secondary"
+										className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold"
+									>
+										Sign in
+									</Button>
 								</Link>{" "}
 								to create a post
 							</div>
 						)
 					)}
 					<hr />
-					{isLoadingRecs && <LoadSpinner size={24} />}
+					{isLoadingRecs && (
+						<div>
+							<HorizontalScroller>
+								{Array.from({ length: 4 }).map((_, i) => (
+									<BookItemSkeleton key={`skeleton-${i}`} />
+								))}
+							</HorizontalScroller>
+						</div>
+					)}
 					{recs && (
 						<div>
 							<h2 className="font-semibold text-lg">You might also like</h2>

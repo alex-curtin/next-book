@@ -24,7 +24,10 @@ const PostItem = ({ post }: { post: PostWithPoster }) => {
 					</Avatar>
 					<div>
 						<p>
-							<Link href={`/users/${post.posterId}`}>
+							<Link
+								href={`/users/${post.posterId}`}
+								className="hover:opacity-80"
+							>
 								@{post.poster?.username}
 							</Link>{" "}
 						</p>
