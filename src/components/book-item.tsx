@@ -21,7 +21,7 @@ const BookItem = ({
 	return (
 		<div className="flex gap-2">
 			<Link href={`/books/${book.googleId}`}>
-				<div className="h-auto w-[125px]">
+				<div className="h-auto w-[125px] hover:brightness-105">
 					<Image
 						src={book.imageUrl || DEFAULT_IMG_URL}
 						alt={book.title}
@@ -33,14 +33,14 @@ const BookItem = ({
 			</Link>
 			<div className="flex flex-col min-w-[125px]">
 				<Link href={`/books/${book.googleId}`}>
-					<p className="font-bold text-black/80 text-lg leading-5">
+					<p className="font-bold text-black/80 text-lg leading-5 hover:opacity-80">
 						{book.title}
 					</p>
 					<p className="text-black/80 text-sm">{book.subtitle}</p>
 				</Link>
 				{book.authors.map((author) => (
 					<Link key={author.name} href={`/authors/${author.name}`}>
-						<p className="text-slate-800 font-semibold text-sm">
+						<p className="text-slate-800 font-semibold text-sm hover:opacity-80">
 							{author.name}
 						</p>
 					</Link>

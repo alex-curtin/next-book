@@ -23,7 +23,7 @@ const CategorySection = ({ category }: { category: Category }) => {
 				<h2 className="text-lg font-bold capitalize">{category.name}</h2>
 				<Link
 					href={`/categories/${category.id}`}
-					className="text-sm text-blue-800"
+					className="text-sm font-semibold text-blue-800 hover:opacity-80"
 				>
 					see more
 				</Link>

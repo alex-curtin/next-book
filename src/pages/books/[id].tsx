@@ -98,15 +98,18 @@ const SingleBookPage = ({ id }: { id: string }) => {
 	const { data: book, isLoading: isLoadingBook } =
 		api.googleApi.getBookById.useQuery({ id });
 
-	if (!book) return <NotFound message="Book not found" />;
-
 	if (isLoadingBook) {
 		return <LoadingPage />;
 	}
 
-	const { data: posts } = api.books.getBookPostsByGoogleId.useQuery({
-		googleId: book.googleId,
-	});
+	if (!book) return <NotFound message="Book not found" />;
+
+	const { data: posts } = api.books.getBookPostsByGoogleId.useQuery(
+		{
+			googleId: book.googleId,
+		},
+		{ enabled: !!book },
+	);
 
 	const userHasReviewed =
 		user && posts
@@ -121,7 +124,7 @@ const SingleBookPage = ({ id }: { id: string }) => {
 		{
 			book: `${book.title} by ${book.authors[0].name}`,
 		},
-		{ retry: false },
+		{ retry: false, enabled: !!book },
 	);
 
 	return (
@@ -139,13 +142,13 @@ const SingleBookPage = ({ id }: { id: string }) => {
 							/>
 						</div>
 						<div className="flex flex-col">
-							<Link href={`/books/${book.googleId}`}>
-								<h2 className="text-black/80 text-3xl">{book.title}</h2>
-								<p className="text-black/80 text-xl">{book.subtitle}</p>
-							</Link>
+							<h2 className="text-black/80 text-3xl">{book.title}</h2>
+							<p className="text-black/80 text-xl">{book.subtitle}</p>
 							{book.authors.map((author) => (
 								<Link key={author.name} href={`/authors/${author.name}`}>
-									<p className="text-slate-700 font-bold">{author.name}</p>
+									<p className="text-slate-700 font-bold hover:opacity-80">
+										{author.name}
+									</p>
 								</Link>
 							))}
 							<div className="mt-auto">

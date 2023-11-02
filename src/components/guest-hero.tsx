@@ -72,7 +72,10 @@ const GuestHero = () => {
 					</div>
 					<p className="mt-4 text-lg">
 						Already have an account?{" "}
-						<Link href="/signin" className="font-semibold text-slate-800">
+						<Link
+							href="/signin"
+							className="font-semibold text-blue-900 hover:opacity-80"
+						>
 							Sign In
 						</Link>
 					</p>
