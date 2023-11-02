@@ -173,7 +173,13 @@ const SingleBookPage = ({ id }: { id: string }) => {
 						!isSignedIn && (
 							<div>
 								<Link href="/signin" className="font-semibold text-slate-800">
-									Sign in
+									<Button
+										size="sm"
+										variant="secondary"
+										className="bg-yellow-300 hover:bg-yellow-400 text-lg font-bold"
+									>
+										Sign in
+									</Button>
 								</Link>{" "}
 								to create a post
 							</div>
